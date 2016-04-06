@@ -5,13 +5,14 @@
 # LICENSE file in the root directory of this source tree. An additional grant
 # of patent rights can be found in the PATENTS file in the same directory.
 
-context('wait')
+#' @include src.translate.env.src.presto.R
+NULL
 
-source('utilities.R')
-
-wait <- RPresto:::wait
-
-test_that('wait works', {
-  expect_gt(system.time(wait())['elapsed'], 50/1000)
-})
-
+#' S3 implementation of \code{sql_translate_env} for Presto.
+#'
+#' @rdname dplyr_function_implementations
+#' @keywords internal
+#' @export
+sql_translate_env.PrestoConnection <- function(conn) {
+  return(src_translate_env.src_presto(conn))
+}

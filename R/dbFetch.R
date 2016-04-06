@@ -11,7 +11,13 @@ NULL
 
 .fetch.uri.with.retries <- function(uri, num.retry=3) {
   get.response <- tryCatch({
-      httr::GET(uri)
+      response <- httr::GET(uri)
+      if (httr::status_code(response) >= 400L) {
+        # stop_for_status also fails for 300 <= status < 400
+        # so we need the if condition
+        httr::stop_for_status(response)
+      }
+      response
     },
     error=function (e) {
       if (num.retry == 0) {
@@ -85,8 +91,10 @@ NULL
   if (!dbIsValid(res)) {
     stop('Result object is not valid')
   }
-  if (as.integer(n) != -1L) {
-    stop('fetching custom number of rows (n != -1) is not supported.')
+  if (!((n > 0 && is.infinite(n))
+      || (as.integer(n) == -1L))) {
+    stop('fetching custom number of rows (n != -1 and n != Inf) ',
+         'is not supported, asking for: ', n)
   }
   return(.fetch.all(res))
 }

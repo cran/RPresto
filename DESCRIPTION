@@ -1,13 +1,13 @@
 Package: RPresto
 Title: DBI Connector to Presto
-Version: 1.2.0
+Version: 1.2.1
 Authors@R: c(
     person('Onur Ismail', 'Filiz', , 'onur@fb.com', role=c('aut', 'cre')),
     person('Sergey', 'Goder', , 'sgoder@fb.com', role='aut'),
     person('John Myles', 'White', , 'johnmyleswhite@fb.com', role='ctb')
     )
 Copyright: Facebook, Inc. 2015-present.
-Description: Implements a DBI compliant interface to Presto. Presto is
+Description: Implements a 'DBI' compliant interface to Presto. Presto is
     an open source distributed SQL query engine for running interactive
     analytic queries against data sources of all sizes ranging from
     gigabytes to petabytes: <https://prestodb.io/>.
@@ -28,15 +28,16 @@ Collate: 'PrestoDriver.R' 'Presto.R' 'PrestoConnection.R'
         'dbSendQuery.R' 'json.tabular.to.data.frame.R' 'extract.data.R'
         'dbFetch.R' 'dbGetQuery.R' 'dbListTables.R' 'dbExistsTable.R'
         'dbGetInfo.R' 'dbGetRowCount.R' 'dbGetStatement.R'
-        'dbIsValid.R' 'dbListFields.R' 'dbUnloadDriver.R' 'fetch.R'
-        'help.R' 'src.desc.src.presto.R' 'src.presto.R'
-        'src.translate.env.src.presto.R' 'tbl.src.presto.R'
+        'dbIsValid.R' 'dbListFields.R' 'dbUnloadDriver.R'
+        'db_query_fields.R' 'fetch.R' 'help.R'
+        'src.translate.env.src.presto.R' 'sql_translate_env.R'
+        'src.desc.src.presto.R' 'src.presto.R' 'tbl.src.presto.R'
 RoxygenNote: 5.0.1
 NeedsCompilation: no
-Packaged: 2016-03-17 20:31:17 UTC; onur
+Packaged: 2016-04-05 17:55:35 UTC; onur
 Author: Onur Ismail Filiz [aut, cre],
   Sergey Goder [aut],
   John Myles White [ctb]
 Maintainer: Onur Ismail Filiz <onur@fb.com>
 Repository: CRAN
-Date/Publication: 2016-03-18 00:00:39
+Date/Publication: 2016-04-06 01:22:17

@@ -1,3 +1,10 @@
+# RPresto 1.2.1
+
+- Handle responses with no column information (fixes #49)
+- Add retries for GET and POST responses with error status codes
+- Skip test cases for ones that need locale modification if we cannot set the locale for the OS.
+- Adapt to changes in the upcoming dplyr and testthat versions.
+
 # RPresto 1.2.0
 
 - Add a `session.timezone` parameter to `dbConnect` and `src_presto` which
