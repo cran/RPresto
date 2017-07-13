@@ -14,6 +14,7 @@
 #' @param user User name to use in the connection
 #' @param host Host name to connect to the database
 #' @param port Port number to use with the host name
+#' @param source Source to specify for the connection
 #' @param session.timezone Time zone for the connection
 #' @param parameters Additional parameters to pass to the connection
 #' @param ... For \code{src_presto} other arguments passed on to the underlying
@@ -32,12 +33,13 @@ src_presto <- function(
     user=NULL,
     host= NULL,
     port=NULL,
+    source=NULL,
     session.timezone=NULL,
     parameters=NULL,
     ...
   ) {
   if(!requireNamespace('dplyr', quietly=TRUE)) {
-    stop('This function requires the dplyr package, please install it first ',
+    stop('src_presto requires the dplyr package, please install it first ',
          'and try again.')
   }
 
@@ -48,19 +50,32 @@ src_presto <- function(
     user=user %||% character(0),
     host=host %||% character(0),
     port=port %||% character(0),
+    source=source %||% character(0),
     session.timezone=session.timezone %||% character(0),
     parameters=parameters %||% list(),
     ...
   )
 
-  info <- DBI::dbGetInfo(con)
-
-  return(dplyr::src_sql(
-    "presto",
-    con,
-    info=info,
-    disco=.db.disconnector(con)
-  ))
+  if (utils::packageVersion('dplyr') >= '0.5.0.9004') {
+    if (!requireNamespace('dbplyr', quietly=TRUE)) {
+      stop('src_presto requires the dbplyr package, please install it first ',
+           'and try again'
+      )
+    }
+    src_function <- utils::getFromNamespace('src_dbi', 'dbplyr')
+    src <- src_function(con, auto_disconnect=FALSE)
+  } else {
+    info <- DBI::dbGetInfo(con)
+    src_function <- utils::getFromNamespace('src_sql', 'dplyr')
+    src <- src_function(
+      "presto",
+      con,
+      info=info,
+      disco=.db.disconnector(con)
+    )
+  }
+  class(src) <- union('src_presto', class(src))
+  return(src)
 }
 
 .db.disconnector <- function(con) {

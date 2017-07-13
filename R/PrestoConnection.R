@@ -5,6 +5,9 @@
 # LICENSE file in the root directory of this source tree. An additional grant
 # of patent rights can be found in the PATENTS file in the same directory.
 
+#' @include PrestoSession.R
+NULL
+
 #' S4 implementation of \code{DBIConnection} for Presto.
 #'
 #' @keywords internal
@@ -17,9 +20,10 @@ setClass('PrestoConnection',
     'user'='character',
     'host'='character',
     'port'='integer',
+    'source'='character',
     'session.timezone'='character',
     'Id'='character',
-    'parameters'='list'
+    'session'='PrestoSession'
   )
 )
 
@@ -33,10 +37,11 @@ setMethod('show',
       'Catalog: ', object@catalog, '\n',
       'Schema: ', object@schema, '\n',
       'User: ', object@user, '\n',
+      'Source: ', object@source, '\n',
       'Session Time Zone: ', object@session.timezone, '\n',
       sep=''
     )
-    parameters <- object@parameters
+    parameters <- object@session$parameters()
     if (!is.null(parameters) && length(parameters)) {
       cat(
         'Parameters:\n',

@@ -22,7 +22,7 @@ NULL
     error=function (e) {
       if (num.retry == 0) {
         stop("There was a problem with the request ",
-         "and we have exhausted our retry limit")
+         "and we have exhausted our retry limit for uri: ", uri)
       }
       message('GET call failed with error: "', conditionMessage(e),
               '", retrying [', 4 - num.retry, '/3]\n')
@@ -61,6 +61,30 @@ NULL
       res@cursor$stats(content[['stats']])
       stop.with.error.message(content)
     }
+
+    # Handle SET/RESET SESSION updates
+    if (!is.null(content[['updateType']])) {
+      switch(
+        content[['updateType']],
+        'SET SESSION' = {
+          properties <- httr::headers(get.response)[['x-presto-set-session']]
+          if (!is.null(properties)) {
+            for (pair in strsplit(properties, ',', fixed = TRUE)) {
+              pair <- unlist(strsplit(pair, '=', fixed = TRUE))
+              res@session$setParameter(pair[1], pair[2])
+            }
+          }
+        },
+        'RESET SESSION' = {
+          properties <- httr::headers(get.response)[['x-presto-clear-session']]
+          if (!is.null(properties)) {
+            for (key in strsplit(properties, ',', fixed = TRUE)) {
+              res@session$unsetParameter(key)
+            }
+          }
+        })
+    }
+
     df <- .extract.data(content, timezone=res@session.timezone)
     res@cursor$updateCursor(content, NROW(df))
   }
@@ -79,7 +103,13 @@ NULL
     # Preserve attributes for empty data frames
     return(rv[[1]])
   } else {
-    if (requireNamespace('dplyr', quietly=TRUE)) {
+    # We need to check for the uniqueness of columns because dplyr::bind_rows
+    # will drop duplicate column names and we want to preserve all the data
+    column.names <- names(rv[[1]])
+    if (
+      requireNamespace('dplyr', quietly=TRUE) &&
+      length(column.names) == length(unique(column.names))
+    ) {
       return(as.data.frame(dplyr::bind_rows(rv)))
     } else {
       return(do.call('rbind', rv))

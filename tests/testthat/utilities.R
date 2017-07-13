@@ -87,6 +87,7 @@ data.frame.with.all.classes <- function(row.indices) {
     c(TRUE, FALSE),
     c(1L, 2L),
     c(0.0, 1.0),
+    c('0', '1.414'),
     c('', 'z'),
     rep(NA, 2),
     as.Date(c('2015-03-01', '2015-03-02')),
@@ -105,7 +106,7 @@ data.frame.with.all.classes <- function(row.indices) {
     rep(NA, 2),
     stringsAsFactors=FALSE
   )
-  column.classes <- c('logical', 'integer', 'numeric', 'character',
+  column.classes <- c('logical', 'integer', 'numeric', 'character', 'character',
     'raw', 'Date', 'POSIXct_no_time_zone', 'POSIXct_with_time_zone',
     'character', 'list_unnamed', 'list_named')
   column.names <- column.classes
@@ -252,7 +253,7 @@ mock_httr_replies <- function(...) {
       } else {
         body.matches <- (
           !is.null(item[['request_body']])
-          && item[['request_body']] == body
+          && grepl(item[['request_body']], body)
         )
       }
 
@@ -274,7 +275,7 @@ read_credentials <- function() {
   if (!file.exists('credentials.dcf')) {
     skip(paste0('credential file missing, please create a file ',
          system.file('tests', 'testthat', 'credentials.dcf', package='RPresto'),
-         ' with fields "host", "port", "catalog", "schema" to do live testing'
+         ' with fields "host", "port", "source", "catalog", "schema" to do live testing'
     ))
   }
   dcf <- read.dcf("credentials.dcf")
@@ -283,23 +284,29 @@ read_credentials <- function() {
     port=as.integer(as.vector(dcf[1, "port"])),
     catalog=as.vector(dcf[1, "catalog"]),
     schema=as.vector(dcf[1, "schema"]),
-    iris_table_name=as.vector(dcf[1, "iris_table_name"])
+    iris_table_name=as.vector(dcf[1, "iris_table_name"]),
+    source=as.vector(dcf[1, "source"])
   )
   return(credentials)
 }
 
-setup_live_connection <- function(session.timezone) {
+setup_live_connection <- function(session.timezone, parameters) {
   skip_on_cran()
   credentials <- read_credentials()
   if (missing(session.timezone)) {
     session.timezone <- ''
+  }
+  if (missing(parameters)) {
+    parameters <- list()
   }
   conn <- dbConnect(RPresto::Presto(),
     schema=credentials$schema,
     catalog=credentials$catalog,
     host=credentials$host,
     port=credentials$port,
+    source=credentials$source,
     session.timezone=session.timezone,
+    parameters=parameters,
     user=Sys.getenv('USER')
   )
   return(conn)
@@ -322,6 +329,7 @@ setup_live_dplyr_connection <- function(session.timezone) {
     catalog=credentials$catalog,
     host=credentials$host,
     port=credentials$port,
+    source=credentials$source,
     user=Sys.getenv('USER'),
     session.timezone=session.timezone,
     parameters=list()
@@ -336,6 +344,7 @@ setup_mock_connection <- function() {
     catalog='catalog',
     host='http://localhost',
     port=8000,
+    source='RPresto Test',
     session.timezone=test.timezone(),
     user=Sys.getenv('USER')
   )
@@ -352,6 +361,7 @@ setup_mock_dplyr_connection <- function() {
     catalog='catalog',
     host='http://localhost',
     port=8000,
+    source='RPresto Test',
     user=Sys.getenv('USER'),
     session.timezone=test.timezone(),
     parameters=list()
