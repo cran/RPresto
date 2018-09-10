@@ -39,13 +39,11 @@ NULL
     if (get.state(content) == 'FAILED') {
       stop.with.error.message(content)
     } else {
-      cursor <- PrestoCursor$new(content)
+      cursor <- PrestoCursor$new(post.response)
       rv <- new('PrestoResult',
-        post.response=post.response,
         statement=statement,
-        session.timezone=conn@session.timezone,
-        cursor=cursor,
-        session=conn@session
+        connection=conn,
+        cursor=cursor
       )
     }
   } else {

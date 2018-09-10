@@ -6,7 +6,7 @@
 # of patent rights can be found in the PATENTS file in the same directory.
 
 #' @include extract.data.R json.tabular.to.data.frame.R
-#' @include utility_functions.R PrestoResult.R
+#' @include utility_functions.R PrestoResult.R parse.response.R
 NULL
 
 .fetch.uri.with.retries <- function(uri, num.retry=3) {
@@ -53,40 +53,7 @@ NULL
         ))
       }
     )
-
-    check.status.code(get.response)
-    content <- response.to.content(get.response)
-    if (get.state(content) == 'FAILED') {
-      res@cursor$state('FAILED')
-      res@cursor$stats(content[['stats']])
-      stop.with.error.message(content)
-    }
-
-    # Handle SET/RESET SESSION updates
-    if (!is.null(content[['updateType']])) {
-      switch(
-        content[['updateType']],
-        'SET SESSION' = {
-          properties <- httr::headers(get.response)[['x-presto-set-session']]
-          if (!is.null(properties)) {
-            for (pair in strsplit(properties, ',', fixed = TRUE)) {
-              pair <- unlist(strsplit(pair, '=', fixed = TRUE))
-              res@session$setParameter(pair[1], pair[2])
-            }
-          }
-        },
-        'RESET SESSION' = {
-          properties <- httr::headers(get.response)[['x-presto-clear-session']]
-          if (!is.null(properties)) {
-            for (key in strsplit(properties, ',', fixed = TRUE)) {
-              res@session$unsetParameter(key)
-            }
-          }
-        })
-    }
-
-    df <- .extract.data(content, timezone=res@session.timezone)
-    res@cursor$updateCursor(content, NROW(df))
+    df <- .parse.response(res, get.response)
   }
   return(df)
 }
@@ -105,7 +72,16 @@ NULL
   } else {
     # We need to check for the uniqueness of columns because dplyr::bind_rows
     # will drop duplicate column names and we want to preserve all the data
-    column.names <- names(rv[[1]])
+    unique.chunk.column.names <- unique(lapply(
+      Filter(function(df) NROW(df) || NCOL(df), rv),
+      names
+    ))
+    if (length(unique.chunk.column.names) != 1) {
+      stop('Chunk column names are different across chunks: ',
+        jsonlite::toJSON(lapply(rv, names))
+      )
+    }
+    column.names <- unique.chunk.column.names[[1]]
     if (
       requireNamespace('dplyr', quietly=TRUE) &&
       length(column.names) == length(unique(column.names))
@@ -129,6 +105,15 @@ NULL
   return(.fetch.all(res))
 }
 
+.fetch.next.chunk <- function(res, n, ...) {
+  if (!res@cursor$postDataParsed()) {
+    df <- .parse.response(res, res@cursor$postResponse())
+    res@cursor$postDataParsed(TRUE)
+    return(df)
+  }
+  return(.fetch.single.uri(res, n, ...))
+}
+
 #' @rdname PrestoResult-class
 #' @export
 setMethod('dbFetch', c('PrestoResult', 'integer'), .fetch.with.count)
@@ -139,4 +124,4 @@ setMethod('dbFetch', c('PrestoResult', 'numeric'), .fetch.with.count)
 
 #' @rdname PrestoResult-class
 #' @export
-setMethod('dbFetch', c('PrestoResult', 'missing'), .fetch.single.uri)
+setMethod('dbFetch', c('PrestoResult', 'missing'), .fetch.next.chunk)
