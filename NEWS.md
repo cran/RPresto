@@ -1,3 +1,10 @@
+# RPresto 1.3.3
+
+- Fix tests for compatibility with `dbplyr` 1.4.0.
+- Send headers with all http requests (#103).
+- Add support for `as.<data_type>` style casting for dplyr (#97).
+- Add Code of Conduct.
+
 # RPresto 1.3.2
 
 - Use the new delayed S3 registration mechanism in 3.6.0 for dplyr method implementations.
