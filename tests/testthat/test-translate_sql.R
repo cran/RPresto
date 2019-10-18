@@ -1,9 +1,8 @@
-# Copyright (c) 2015-present, Facebook, Inc.
+# Copyright (c) Facebook, Inc. and its affiliates.
 # All rights reserved.
 #
 # This source code is licensed under the BSD-style license found in the
-# LICENSE file in the root directory of this source tree. An additional grant
-# of patent rights can be found in the PATENTS file in the same directory.
+# LICENSE file in the root directory of this source tree.
 
 context('translate_sql')
 
@@ -43,14 +42,30 @@ with_locale(test.locale(), test_that)('as() works', {
 
   # Hacky dummy table so that we can test substitution
   s <- setup_live_dplyr_connection()[['db']]
-  t <- dplyr::tbl(
-    s,
-    from=dplyr::sql_subquery(
-      s[['con']],
-      dplyr::sql('SELECT 1')
-    ),
-    vars=c('x')
-  )
+  if (requireNamespace('dbplyr', quietly=TRUE)
+      && utils::compareVersion(
+        as.character(utils::packageVersion('dbplyr')),
+        '1.3.0'
+      ) >= 0
+  ) {
+    # vars argument gives a deprecation warning starting with 1.3.0
+    t <- dplyr::tbl(
+      s,
+      from=dplyr::sql_subquery(
+        s[['con']],
+        dplyr::sql('SELECT 1')
+      )
+    )
+  } else {
+    t <- dplyr::tbl(
+      s,
+      from=dplyr::sql_subquery(
+        s[['con']],
+        dplyr::sql('SELECT 1')
+      ),
+      vars=c('x')
+    )
+  }
 
   l <- list(a=1L)
   expect_equal(
@@ -77,23 +92,37 @@ with_locale(test.locale(), test_that)('as() works', {
     c=as(a, p),
     d=as(a, l)
   )))
+  old_expected_query_pattern <- paste0(
+    '^SELECT "b"( AS "b")?, "c"( AS "c")?, "d"( AS "d")?.*',
+    'FROM \\(',
+      'SELECT ',
+        '"_col0", ',
+        'CAST\\("a" AS VARBINARY\\) AS "b", ' ,
+        'CAST\\("a" AS TIMESTAMP WITH TIME ZONE\\) AS "c", ',
+        'CAST\\("a" AS BOOLEAN\\) AS "d"\n',
+      'FROM \\(',
+        '\\(SELECT 1\\) "[_0-9a-z]+"',
+      '\\) "[_0-9a-z]+"',
+    '\\) "[_0-9a-z]+"$'
+  )
+  new_expected_query_pattern <- paste0(
+    '^SELECT ',
+      'CAST\\("a" AS VARBINARY\\) AS "b", ' ,
+      'CAST\\("a" AS TIMESTAMP WITH TIME ZONE\\) AS "c", ',
+      'CAST\\("a" AS BOOLEAN\\) AS "d"\n',
+    'FROM \\(',
+      '\\(SELECT 1\\) "[_0-9a-z]+"',
+    '\\) "[_0-9a-z]+"$'
+  )
+  # newer versions of dplyr have a simpler pattern
+  expected_query_pattern <- paste0('(',
+    old_expected_query_pattern,
+    "|",
+    new_expected_query_pattern,
+    ')'
+  )
   expect_true(
-    grepl(
-      paste0(
-        '^SELECT "b"( AS "b")?, "c"( AS "c")?, "d"( AS "d")?.*',
-        'FROM \\(',
-          'SELECT ',
-            '"_col0", ',
-            'CAST\\("a" AS VARBINARY\\) AS "b", ' ,
-            'CAST\\("a" AS TIMESTAMP WITH TIME ZONE\\) AS "c", ',
-            'CAST\\("a" AS BOOLEAN\\) AS "d"\n',
-          'FROM \\(',
-            '\\(SELECT 1\\) "[_0-9a-z]+"',
-          '\\) "[_0-9a-z]+"',
-        '\\) "[_0-9a-z]+"$'
-      ),
-      query
-    )
+    grepl(expected_query_pattern, query)
   )
 })
 
@@ -131,5 +160,175 @@ with_locale(test.locale(), test_that)('as.<type>() works', {
   expect_equal(
     translate_sql(as.raw(x), con=s[['con']]),
     dplyr::sql('CAST("x" AS VARBINARY)')
+  )
+})
+
+with_locale(test.locale(), test_that)('`[[` works for char/numeric indices', {
+  dbplyr_version <- try(as.character(utils::packageVersion('dbplyr')))
+  if (inherits(dbplyr_version, 'try-error')) {
+    skip('dbplyr not available')
+  } else if (utils::compareVersion(dbplyr_version, '1.4.0') < 0) {
+    skip('remote evaluation of `[[` requires dbplyr >= 1.4.0')
+  }
+
+  translate_sql <- RPresto:::dbplyr_compatible('translate_sql')
+  s <- setup_mock_dplyr_connection()[['db']]
+
+  # a character index should be escaped
+  expect_equal(
+    translate_sql(x[['a']], con=s[['con']]),
+    dbplyr::sql("\"x\"['a']")
+  )
+  # but a numeric index (for arrays) should not
+  expect_equal(
+    translate_sql(x[[1]], con=s[['con']]),
+    dbplyr::sql("\"x\"[1]")
+  )
+  expect_equal(
+    translate_sql(x[[1L]], con=s[['con']]),
+    dbplyr::sql("\"x\"[1]")
+  )
+
+  # neither `x` nor `i` should be evaluated locally
+  expect_equal(
+    translate_sql(dim[['a']], con=s[['con']]),
+    dbplyr::sql("\"dim\"['a']")
+  )
+  expect_equal(
+    translate_sql(x[['dim']], con=s[['con']]),
+    dbplyr::sql("\"x\"['dim']")
+  )
+})
+
+with_locale(test.locale(), test_that)('`[[` works for dynamic indices', {
+  dbplyr_version <- try(as.character(utils::packageVersion('dbplyr')))
+  if (inherits(dbplyr_version, 'try-error')) {
+    skip('dbplyr not available')
+  } else if (utils::compareVersion(dbplyr_version, '1.4.0') < 0) {
+    skip('remote evaluation of `[[` requires dbplyr >= 1.4.0')
+  }
+
+  # create an inline table with both array and map columns
+  x <- dplyr::tbl(
+    setup_live_dplyr_connection()[['db']],
+    dbplyr::sql(
+      "SELECT * FROM (
+      VALUES
+        (
+          ARRAY['a', 'b'],
+          MAP(ARRAY[1, 2], ARRAY['map_1', 'map_2']),
+          2.0
+        ),
+        (
+          ARRAY['x', 'y'],
+          MAP(ARRAY[1.5, 2.5], ARRAY['map_1.5', 'map_2.5']),
+          1.0
+        )
+    ) AS data(arr, map, idx)"
+    )
+  )
+
+  # index an array with a function of fixed values
+  expect_equal(
+    x %>%
+      dplyr::mutate(y = arr[[as.integer(POW(2, 1))]]) %>%
+      dplyr::pull(y),
+    c("b", "y")
+  )
+
+  # index an array with a function of a dynamic reference
+  expect_equal(
+    x %>%
+      dplyr::mutate(y = arr[[as.integer(POW(idx, 1))]]) %>%
+      dplyr::pull(y),
+    c("b", "x")
+  )
+
+  # index a map with a function of fixed values
+  expect_equal(
+    x %>%
+      dplyr::mutate(y = map[[as.integer(POW(2, 1))]]) %>%
+      dplyr::pull(y),
+    c("map_2", NA)
+  )
+
+  # index a map with a function of a dynamic reference
+  expect_equal(
+    x %>%
+      dplyr::mutate(y = map[[as.integer(POW(idx, 1))]]) %>%
+      dplyr::pull(y),
+    c("map_2", NA)
+  )
+
+  # index an array with a fixed numeric
+  expect_equal(
+    x %>%
+      dplyr::mutate(y = arr[[1]]) %>%
+      dplyr::pull(y),
+    c("a", "x")
+  )
+
+  # index an array with a fixed integer
+  expect_equal(
+    x %>%
+      dplyr::mutate(y = arr[[1L]]) %>%
+      dplyr::pull(y),
+    c("a", "x")
+  )
+
+  # index a map with an integer-ish numeric
+  expect_equal(
+    x %>%
+      dplyr::mutate(y = map[[1]]) %>%
+      dplyr::pull(y),
+    c("map_1", NA)
+  )
+
+  # index a map with a numeric
+  expect_equal(
+    x %>%
+      dplyr::mutate(y = map[[1.5]]) %>%
+      dplyr::pull(y),
+    c(NA, "map_1.5")
+  )
+
+  # index a map with an integer
+  expect_equal(
+    x %>%
+      dplyr::mutate(y = map[[1L]]) %>%
+      dplyr::pull(y),
+    c("map_1", NA)
+  )
+
+  # index an array with a dynamic reference coerced to an integer
+  expect_equal(
+    x %>%
+      dplyr::mutate(y = arr[[as.integer(idx)]]) %>%
+      dplyr::pull(y),
+    c("b", "x")
+  )
+
+  # index a map with an integer-ish dynamic reference
+  expect_equal(
+    x %>%
+      dplyr::mutate(y = map[[idx]]) %>%
+      dplyr::pull(y),
+    c("map_2", NA)
+  )
+
+  # index a map with a function of an integer-ish dynamic reference
+  expect_equal(
+    x %>%
+      dplyr::mutate(y = map[[idx + 0.5]]) %>%
+      dplyr::pull(y),
+    c(NA, "map_1.5")
+  )
+
+  # index a map with a dynamic reference coerced to an integer
+  expect_equal(
+    x %>%
+      dplyr::mutate(y = map[[as.integer(idx)]]) %>%
+      dplyr::pull(y),
+    c("map_2", NA)
   )
 })

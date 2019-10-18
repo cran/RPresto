@@ -1,9 +1,8 @@
-# Copyright (c) 2015-present, Facebook, Inc.
+# Copyright (c) Facebook, Inc. and its affiliates.
 # All rights reserved.
 #
 # This source code is licensed under the BSD-style license found in the
-# LICENSE file in the root directory of this source tree. An additional grant
-# of patent rights can be found in the PATENTS file in the same directory.
+# LICENSE file in the root directory of this source tree.
 
 #' @include dbplyr_compatible.R PrestoConnection.R
 NULL
@@ -68,7 +67,13 @@ sql_translate_env.PrestoConnection <- function(con) {
       pmin = sql_prefix("LEAST"),
       is.finite = sql_prefix("IS_FINITE"),
       is.infinite = sql_prefix("IS_FINITE"),
-      is.nan = sql_prefix("IS_NAN")
+      is.nan = sql_prefix("IS_NAN"),
+      `[[` = function(x, i) {
+        if (is.numeric(i) && isTRUE(all.equal(i, as.integer(i)))) {
+          i <- as.integer(i)
+        }
+        dbplyr::build_sql(x, "[", i, "]")
+      }
     ),
     sql_translator(.parent = base_agg,
       n = function() sql("COUNT(*)"),

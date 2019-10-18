@@ -1,9 +1,8 @@
-# Copyright (c) 2015-present, Facebook, Inc.
+# Copyright (c) Facebook, Inc. and its affiliates.
 # All rights reserved.
 #
 # This source code is licensed under the BSD-style license found in the
-# LICENSE file in the root directory of this source tree. An additional grant
-# of patent rights can be found in the PATENTS file in the same directory.
+# LICENSE file in the root directory of this source tree.
 
 context('integration')
 
@@ -51,7 +50,7 @@ test_that('Integration tests work', {
   expect_that(nrow(df), equals(5))
   expect_that(ncol(df), equals(5))
 
-  expect_that(dbClearResult(rs), is_true())
+  expect_true(dbClearResult(rs))
 
   df <- dbGetQuery(conn, sql)
   expect_that(df, is_a("data.frame"))
@@ -62,5 +61,5 @@ test_that('Integration tests work', {
   expect_that(tbls, is_a("character"))
   expect_that(length(tbls), is_more_than(0))
 
-  expect_that(dbDisconnect(conn), is_true())
+  expect_true(dbDisconnect(conn))
 })
