@@ -12,6 +12,7 @@ NULL
 #' @slot connection The connection object associated with the result
 #' @slot cursor An internal implementation detail for keeping track of
 #'  what stage a request is in
+#' @slot query.id Presto id for the query
 #' @keywords internal
 #' @export
 setClass('PrestoResult',
@@ -19,7 +20,8 @@ setClass('PrestoResult',
   slots=c(
     'statement'='character',
     'connection'='PrestoConnection',
-    'cursor'='PrestoCursor'
+    'cursor'='PrestoCursor',
+    'query.id'='character'
   )
 )
 
@@ -29,11 +31,10 @@ setMethod('show',
   'PrestoResult',
   function(object) {
     r <- object@cursor$postResponse()
-    content <- response.to.content(r)
     stats <- object@cursor$stats()
 
     cat(
-      '<PrestoResult: ', content[['id']], '>\n',
+      '<PrestoResult: ', object@query.id, '>\n',
       'Status Code: ', httr::status_code(r), '\n',
       'State: ', object@cursor$state(), '\n',
       'Info URI: ', object@cursor$infoUri(), '\n',
