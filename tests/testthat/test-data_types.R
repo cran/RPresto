@@ -23,7 +23,7 @@ test_that("Queries return the correct primitive types", {
                data_frame(bool = TRUE))
   expect_equal_data_frame(dbGetQuery(conn, "select 1 one"),
                data_frame(one = 1))
-  expect_equal_data_frame(dbGetQuery(conn, "select 1.0 one"),
+  expect_equal_data_frame(dbGetQuery(conn, "select cast(1 as double) one"),
                data_frame(one = 1.0))
   expect_equal_data_frame(dbGetQuery(conn, "select 'one' one"),
                data_frame(one = 'one'))
@@ -70,6 +70,38 @@ test_that("Queries return the correct map types", {
                          select map(array[3], array[4]) m, 2 r
                          order by r"),
                e)
+})
+
+test_that("Queries return the correct row types", {
+  conn <- setup_live_connection()
+  e <- data_frame(r = NA)
+  e[[1]] <- list(list(x = 1))
+  expect_equal_data_frame(
+    dbGetQuery(conn, "select cast(row(1) as row(x bigint)) r"),
+    e
+  )
+  e[[1]] <- list(list(x = 1, y = "a"))
+  expect_equal_data_frame(
+    dbGetQuery(
+      conn,
+      "select cast(row(1, 'a') as row(x bigint, y varchar)) r"
+    ),
+    e
+  )
+  e <- data_frame(r = rep(NA, 2))
+  e[[1]] <- list(list(x = 1L, y = "a"), list(x = 2L, y = "b"))
+  expect_equal_data_frame(
+    dbGetQuery(
+      conn,
+      "
+        select cast(row(1, 'a') as row(x bigint, y varchar)) r
+        union all
+        select cast(row(2, 'b') as row(x bigint, y varchar)) r
+        order by r.x
+      "
+    ),
+    e
+  )
 })
 
 test_that("all data types work", {
@@ -155,7 +187,7 @@ test_that("all data types work", {
     type_array_bigint=NA,
     type_map_varchar_bigint=NA
   )
-  attr(e[['type_timestamp_with_timezone']], 'tzone') <- NULL
+  attr(e[['type_timestamp_with_timezone']], 'tzone') <- ""
   attr(e[['type_timestamp']], 'tzone') <- test.timezone()
   e[['type_varbinary']] <- list(NA)
   e[['type_array_bigint']] <- list(NA)

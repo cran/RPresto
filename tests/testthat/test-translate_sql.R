@@ -177,26 +177,26 @@ with_locale(test.locale(), test_that)('`[[` works for char/numeric indices', {
   # a character index should be escaped
   expect_equal(
     translate_sql(x[['a']], con=s[['con']]),
-    dbplyr::sql("\"x\"['a']")
+    dbplyr::sql("ELEMENT_AT(\"x\", 'a')")
   )
   # but a numeric index (for arrays) should not
   expect_equal(
     translate_sql(x[[1]], con=s[['con']]),
-    dbplyr::sql("\"x\"[1]")
+    dbplyr::sql("ELEMENT_AT(\"x\", 1)")
   )
   expect_equal(
     translate_sql(x[[1L]], con=s[['con']]),
-    dbplyr::sql("\"x\"[1]")
+    dbplyr::sql("ELEMENT_AT(\"x\", 1)")
   )
 
   # neither `x` nor `i` should be evaluated locally
   expect_equal(
     translate_sql(dim[['a']], con=s[['con']]),
-    dbplyr::sql("\"dim\"['a']")
+    dbplyr::sql("ELEMENT_AT(\"dim\", 'a')")
   )
   expect_equal(
     translate_sql(x[['dim']], con=s[['con']]),
-    dbplyr::sql("\"x\"['dim']")
+    dbplyr::sql("ELEMENT_AT(\"x\", 'dim')")
   )
 })
 
@@ -332,3 +332,80 @@ with_locale(test.locale(), test_that)('`[[` works for dynamic indices', {
     c("map_2", NA)
   )
 })
+
+with_locale(test.locale(), test_that)('is.[in]finite() works', {
+  if (!requireNamespace('dplyr', quietly=TRUE)) {
+    skip('dplyr not available')
+  }
+
+  translate_sql <- RPresto:::dbplyr_compatible('translate_sql')
+  translate_sql_ <- RPresto:::dbplyr_compatible('translate_sql_')
+
+  s <- setup_mock_dplyr_connection()[['db']]
+
+  expect_equal(
+    translate_sql(is.infinite(x), con = s$con),
+    dplyr::sql("IS_INFINITE(\"x\")")
+  )
+
+  expect_equal(
+    translate_sql(is.finite(x), con = s$con),
+    dplyr::sql("IS_FINITE(\"x\")")
+  )
+})
+
+with_locale(test.locale(), test_that)('quantile() and median() throw errors', {
+  dbplyr_version <- try(as.character(utils::packageVersion('dbplyr')))
+  if (inherits(dbplyr_version, 'try-error')) {
+    skip('dbplyr not available')
+  } else if (utils::compareVersion(dbplyr_version, '1.4.0') < 0) {
+    skip('remote evaluation of `[[` requires dbplyr >= 1.4.0')
+  }
+
+  translate_sql <- RPresto:::dbplyr_compatible('translate_sql')
+  s <- setup_mock_dplyr_connection()[['db']]
+
+  expect_error(translate_sql(quantile(x, 0.9), con=s[['con']]))
+  expect_error(translate_sql(median(x), con=s[['con']]))
+
+  x <- dplyr::tbl(
+    setup_live_dplyr_connection()[['db']],
+    dbplyr::sql(
+      "SELECT * FROM (
+      VALUES
+        ('a', 1),
+        ('b', 2)
+    ) AS data(y, z)"
+    )
+  )
+
+  expect_error(dplyr::summarize(x, q = quantile(z, 0.9)))
+  expect_error(dplyr::summarize(x, q = median(z)))
+
+  # aggregate
+  expect_error(
+    x %>%
+      dplyr::group_by(y) %>%
+      dplyr::summarize(q = quantile(z, 0.9))
+  )
+
+  expect_error(
+    x %>%
+      dplyr::group_by(y) %>%
+      dplyr::summarize(q = median(z))
+  )
+
+  # windowed
+  expect_error(
+    x %>%
+      dplyr::group_by(y) %>%
+      dplyr::mutate(q = quantile(z, 0.9))
+  )
+
+  expect_error(
+    x %>%
+      dplyr::group_by(y) %>%
+      dplyr::mutate(q = median(z))
+  )
+})
+
