@@ -1,43 +1,43 @@
-# Copyright (c) Facebook, Inc. and its affiliates.
+# Copyright (c) Meta Platforms, Inc. and affiliates.
 # All rights reserved.
 #
 # This source code is licensed under the BSD-style license found in the
 # LICENSE file in the root directory of this source tree.
 
-context('check.status.code')
+context(".check.response.status")
 
-source('utilities.R')
+source("utilities.R")
 
-check.status.code <- RPresto:::check.status.code
+.check.response.status <- RPresto:::.check.response.status
 
-test_that('check.status.code works', {
+test_that(".check.response.status works", {
   response <- mock_httr_response(
-      'dummy_url',
-      state='dummy_state',
-      status_code=400,
-      extra_content=list('failed query')
-  )[['response']]
-  expect_error(check.status.code(response), '"failed query"')
+    "dummy_url",
+    state = "dummy_state",
+    status_code = 400,
+    extra_content = list("failed query")
+  )[["response"]]
+  expect_error(.check.response.status(response), '"failed query"')
 
   response <- mock_httr_response(
-      'dummy_url',
-      state='dummy_state',
-      status_code=200
-  )[['response']]
-  expect_equal(check.status.code(response), invisible())
+    "dummy_url",
+    state = "dummy_state",
+    status_code = 200
+  )[["response"]]
+  expect_equal(.check.response.status(response), invisible())
 
   response <- structure(
     list(
-      url='dummy_url',
-      status_code=403,
-      headers=list('content-type'='application/json'),
-      content=charToRaw('')
+      url = "dummy_url",
+      status_code = 403,
+      headers = list("content-type" = "application/json"),
+      content = charToRaw("")
     ),
-    class='response'
+    class = "response"
   )
   expect_error(
-    check.status.code(response),
-    '403',
-    class='http_403'
+    .check.response.status(response),
+    "403",
+    class = "http_403"
   )
 })

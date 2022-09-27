@@ -1,4 +1,4 @@
-# Copyright (c) Facebook, Inc. and its affiliates.
+# Copyright (c) Meta Platforms, Inc. and affiliates.
 # All rights reserved.
 #
 # This source code is licensed under the BSD-style license found in the
@@ -8,9 +8,10 @@
 NULL
 
 .dbHasCompleted <- function(res, ...) {
-  return(res@cursor$hasCompleted())
+  return(res@query$hasCompleted())
 }
 
 #' @rdname PrestoResult-class
+#' @importMethodsFrom DBI dbHasCompleted
 #' @export
-setMethod('dbHasCompleted', 'PrestoResult', .dbHasCompleted)
+setMethod("dbHasCompleted", "PrestoResult", .dbHasCompleted)

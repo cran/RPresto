@@ -1,4 +1,4 @@
-# Copyright (c) Facebook, Inc. and its affiliates.
+# Copyright (c) Meta Platforms, Inc. and affiliates.
 # All rights reserved.
 #
 # This source code is licensed under the BSD-style license found in the
@@ -8,9 +8,10 @@
 NULL
 
 .dbGetRowCount <- function(res, ...) {
-  return(res@cursor$fetchedRowCount())
+  return(res@query$fetchedRowCount())
 }
 
 #' @rdname PrestoResult-class
+#' @importMethodsFrom DBI dbGetRowCount
 #' @export
-setMethod('dbGetRowCount', 'PrestoResult', .dbGetRowCount)
+setMethod("dbGetRowCount", "PrestoResult", .dbGetRowCount)

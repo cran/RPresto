@@ -1,4 +1,4 @@
-# Copyright (c) Facebook, Inc. and its affiliates.
+# Copyright (c) Meta Platforms, Inc. and affiliates.
 # All rights reserved.
 #
 # This source code is licensed under the BSD-style license found in the
@@ -12,5 +12,6 @@ NULL
 }
 
 #' @rdname PrestoResult-class
+#' @importMethodsFrom DBI dbGetStatement
 #' @export
-setMethod('dbGetStatement', 'PrestoResult', .dbGetStatement)
+setMethod("dbGetStatement", "PrestoResult", .dbGetStatement)

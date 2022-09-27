@@ -1,4 +1,4 @@
-# Copyright (c) Facebook, Inc. and its affiliates.
+# Copyright (c) Meta Platforms, Inc. and affiliates.
 # All rights reserved.
 #
 # This source code is licensed under the BSD-style license found in the
@@ -8,9 +8,9 @@
 NULL
 
 #' Connect to a Presto database
-#' @return [Presto] A \code{\linkS4class{PrestoDriver}} object
+#' @return [Presto] A [PrestoDriver-class] object
 #' @rdname Presto
 #' @export
 Presto <- function(...) {
-  return(new('PrestoDriver'))
+  return(methods::new("PrestoDriver"))
 }

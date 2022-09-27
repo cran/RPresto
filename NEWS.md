@@ -1,3 +1,58 @@
+# RPresto 1.4.0
+
+* Change maintainer to Jarod Meng (jarodm@fb.com)
+* Major refactoring of the internal schema and data parsing functions to enable
+more robust mapping between Presto data types and R types
+  * The output is changed from `data.frame` to `tibble` to offer better printing
+    and be more consistent with other DBI-compatible datawarehouse packages
+  * Add more user-friendly R types translation for primitive Presto data types
+    (e.g., DATE types are now translated to `Date` classes in R; TIMESTAMP types
+    are translated to `POSIXct` classes; TIME types are translated to `difftime`
+    classes; INTERVAL types are translated to `Duration` classes)
+  * Enable more choices of BIGINT type handling (i.e., `integer64`, `integer`,
+    `numeric`, or `character`). (#61)
+  * Add complete support for complex Presto types (i.e., ARRAY, MAP, and ROW).
+    They are now translated to typed vectors, lists, or tibbles depending on the
+    types and structure of the data. (#118)
+  * It supports all primitive and complex data types for Trino too. (#176)
+* Add vignettes on Presto-R type translations (see `vignette("primitive-types")`
+  and `vignette("complex-types")`)
+* `dbExistsTable()` error when quoted identifier is supplied as `name` is fixed
+  (#167)
+* Add a few `dplyr` and `dbplyr` method implementations. See
+  `backend-implementation.md` for the details.
+  * `dbplyr::sql_query_save()`
+  * `dplyr::db_list_tables()`
+  * `dplyr::db_has_table()`
+  * `dplyr::db_write_table()`
+  * `dbplyr::db_copy_to()`
+  * `dplyr::copy_to()` method for `src_presto` and `PrestoConnection`
+  * `dplyr::tbl()` method for `PrestoConnection`
+  * `dbplyr::db_compute()`
+  * `dplyr::compute()`
+* `PrestoConnection` gains a `request.config` slot whereby users can set extra
+  Curl configs (as returned by `httr::config()` to GET/POST requests. (#173)
+* Styling the whole package using `styler::style_pkg()`. A notable change is to
+  user double quotes everywhere instead of a combination of single and double
+  quotes. (#174)
+* Add an experimental feature to support common table expressions (CTEs) in both
+  DBI and dplyr backends (see `vignette("common-table-expressions")`) (#175)
+* `dbConnect()` now uses empty string "" (rather than UTC) as the default
+  session.timezone which translates to the Presto server timezone.
+* `dbConnect()` and `src_presto()` gain an `output.timezone` argument which can
+  be used to control how `TIME WITH TZ` and `TIMESTAMP` values are represented
+  in the output tibble.
+* `dbGetQuery()` and `dbSendQuery()` gain a `quiet` argument which defaults to
+  `getOption("rpresto.quiet")` which is `NA` if not set. (#191)
+
+# RPresto 1.3.8
+
+- Fix failing unit tests (#141)
+- Support Trino headers in session (#143)
+- Update copyright headers
+- Migrate RPresto's dplyr interface to use dbplyr 2.0.0 backend (#150)
+* Add documentation on RPresto's DBI and `dplyr` backend implementation
+
 # RPresto 1.3.7
 
 - Fix testing errors caused by Presto changes since last update (#131)

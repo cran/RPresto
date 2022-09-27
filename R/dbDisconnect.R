@@ -1,4 +1,4 @@
-# Copyright (c) Facebook, Inc. and its affiliates.
+# Copyright (c) Meta Platforms, Inc. and affiliates.
 # All rights reserved.
 #
 # This source code is licensed under the BSD-style license found in the
@@ -7,12 +7,14 @@
 #' @include PrestoConnection.R
 NULL
 
-#' @param conn A \code{\linkS4class{PrestoConnection}} object
-#' @return [dbDisconnect] A \code{\link{logical}} value indicating success
+#' @param conn A [PrestoConnection-class] object
+#' @return [dbDisconnect] A [logical()] value indicating success
+#' @importMethodsFrom DBI dbDisconnect
 #' @export
 #' @rdname Presto
-setMethod('dbDisconnect',
-  'PrestoConnection',
+setMethod(
+  "dbDisconnect",
+  "PrestoConnection",
   function(conn) {
     return(TRUE)
   }

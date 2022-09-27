@@ -13,46 +13,46 @@
 \S4method{dbGetInfo}{PrestoResult}(dbObj)
 }
 \arguments{
-\item{dbObj}{A \code{\linkS4class{PrestoDriver}},
-\code{\linkS4class{PrestoConnection}}
-or \code{\linkS4class{PrestoResult}} object}
+\item{dbObj}{A \linkS4class{PrestoDriver},
+\linkS4class{PrestoConnection}
+or \linkS4class{PrestoResult} object}
 }
 \value{
-[PrestoResult] A \code{\link{list}} with elements
-  \describe{
-    \item{statement}{The SQL sent to the database}
-    \item{row.count}{Number of rows fetched so far}
-    \item{has.completed}{Whether all data has been fetched}
-    \item{stats}{Current stats on the query}
-  }
+\linkS4class{PrestoResult} A \code{\link[=list]{list()}} with elements
+\describe{
+\item{statement}{The SQL sent to the database}
+\item{row.count}{Number of rows fetched so far}
+\item{has.completed}{Whether all data has been fetched}
+\item{stats}{Current stats on the query}
+}
 }
 \description{
 Metadata about database objects
 
-For the \code{\linkS4class{PrestoResult}} object, the implementation
+For the \linkS4class{PrestoResult} object, the implementation
 returns the additional \code{stats} field which can be used to
 implement things like progress bars. See the examples section.
 }
 \examples{
 \dontrun{
-  conn <- dbConnect(Presto(), 'localhost', 7777, 'onur', 'datascience')
-  result <- dbSendQuery(conn, 'SELECT * FROM jonchang_iris')
-  iris <- data.frame()
-  progress.bar <- NULL
-  while (!dbHasCompleted(result)) {
-    chunk <- dbFetch(result)
-    if (!NROW(iris)) {
-      iris <- chunk
-    } else if (NROW(chunk)) {
-      iris <- rbind(iris, chunk)
-    }
-    stats <- dbGetInfo(result)[['stats']]
-    if (is.null(progress.bar)) {
-      progress.bar <- txtProgressBar(0, stats[['totalSplits']], style=3)
-    } else {
-      setTxtProgressBar(progress.bar, stats[['completedSplits']])
-    }
+conn <- dbConnect(Presto(), "localhost", 7777, "onur", "datascience")
+result <- dbSendQuery(conn, "SELECT * FROM jonchang_iris")
+iris <- data.frame()
+progress.bar <- NULL
+while (!dbHasCompleted(result)) {
+  chunk <- dbFetch(result)
+  if (!NROW(iris)) {
+    iris <- chunk
+  } else if (NROW(chunk)) {
+    iris <- rbind(iris, chunk)
   }
-  close(progress.bar)
+  stats <- dbGetInfo(result)[["stats"]]
+  if (is.null(progress.bar)) {
+    progress.bar <- txtProgressBar(0, stats[["totalSplits"]], style = 3)
+  } else {
+    setTxtProgressBar(progress.bar, stats[["completedSplits"]])
+  }
+}
+close(progress.bar)
 }
 }

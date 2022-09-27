@@ -7,7 +7,7 @@
 \S4method{dbDataType}{PrestoDriver}(dbObj, obj, ...)
 }
 \arguments{
-\item{dbObj}{A \code{\linkS4class{PrestoDriver}} object}
+\item{dbObj}{A \linkS4class{PrestoDriver} object}
 
 \item{obj}{Any R object}
 
@@ -15,7 +15,7 @@
 }
 \value{
 A \code{character} value corresponding to the Presto type for
-        \code{obj}
+\code{obj}
 }
 \description{
 Return the corresponding presto data type for the given R \code{object}
@@ -36,9 +36,9 @@ drv <- RPresto::Presto()
 dbDataType(drv, list())
 dbDataType(drv, 1)
 dbDataType(drv, NULL)
-dbDataType(drv, list(list(list(a=Sys.Date()))))
-dbDataType(drv, as.POSIXct('2015-03-01 00:00:00', tz='UTC'))
+dbDataType(drv, list(list(list(a = Sys.Date()))))
+dbDataType(drv, as.POSIXct("2015-03-01 00:00:00", tz = "UTC"))
 dbDataType(drv, Sys.time())
 # Data types for ARRAY or MAP values can be tricky
-all.equal('VARCHAR', dbDataType(drv, list(1, 2, 3L)))
+all.equal("VARCHAR", dbDataType(drv, list(1, 2, 3L)))
 }
