@@ -8,13 +8,6 @@ context("copy_to.src_presto and db_copy_to")
 
 source("utilities.R")
 
-test_df <- tibble::tibble(
-  field1 = c("a", "b"),
-  field2 = c(1L, 2L),
-  field3 = c(3.14, 2.72),
-  field4 = c(TRUE, FALSE)
-)
-
 .test_src <- function(src, test_table_name) {
   if (inherits(src, "src_presto")) {
     con <- src$con
@@ -30,32 +23,34 @@ test_df <- tibble::tibble(
   expect_equal_data_frame(collect(tbl), test_df)
   expect_error(
     tbl <- copy_to(dest = src, df = test_df, name = test_table_name),
-    "exists but overwrite is set to FALSE"
+    "exists in database, and both overwrite and append are FALSE"
   )
   expect_message(
     tbl <- copy_to(
       dest = src, df = test_df, name = test_table_name, overwrite = TRUE
     ),
-    "is overwritten"
+    "The table .* is overwritten"
   )
   expect_true(dbExistsTable(con, test_table_name))
   expect_equal_data_frame(collect(tbl), test_df)
 }
 
 test_that("dplyr::copy_to works for src_presto", {
-  src <- setup_live_dplyr_connection()[["db"]]
+  src <- src_presto(
+    con = presto_default(output.timezone = "America/Los_Angeles")
+  )
   test_table_name <- "test_copyto_srcpresto"
   .test_src(src, test_table_name)
 })
 
 test_that("dplyr::copy_to works for PrestoConnection", {
-  src <- setup_live_connection()
+  src <- presto_default(output.timezone = "America/Los_Angeles")
   test_table_name <- "test_copyto_prestoconnection"
   .test_src(src, test_table_name)
 })
 
 test_that("dbplyr::db_copy_to works for PrestoConnection", {
-  con <- setup_live_connection()
+  con <- presto_default(output.timezone = "America/Los_Angeles")
   test_table_name <- "test_dbcopyto"
   if (dbExistsTable(con, test_table_name)) {
     dbRemoveTable(con, test_table_name)

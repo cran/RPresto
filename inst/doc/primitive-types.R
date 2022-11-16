@@ -96,6 +96,14 @@ dbGetQuery(
 ## ----floating-point-check-----------------------------------------------------
 purrr::map_chr(df.floating_point, class)
 
+## ----fixed-precision-type-----------------------------------------------------
+(
+  df.fixed_precision <- dbGetQuery(
+    con,
+    "SELECT decimal FROM presto_primitive_types"
+  )
+)
+
 ## ----character-types----------------------------------------------------------
 (
   df.characters <- dbGetQuery(

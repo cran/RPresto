@@ -1,3 +1,16 @@
+# RPresto 1.4.1
+
+* `dbListFields` now works with identifier name which in turn supports the use
+  of `in_schema()` in `tbl()` (#200)
+* Fix an error whereby join query's CTEs are not properly retrieved (#203)
+* Fix a bug that causes NULL values in a ROW to return data-schema mismatch
+  error (#206)
+* Add `dbQuoteLiteral()` and `dbAppendTable()` implementations.
+* Rewrite `dbWriteTable()` implementation to use `dbCreateTable()` and
+  `dbAppendTable()`. It also supports all default arguments now (#199)
+* `dbWriteTable()` gains a `use.one.query` option to use a single `CREATE TABLE
+  AS` query.
+
 # RPresto 1.4.0
 
 * Change maintainer to Jarod Meng (jarodm@fb.com)

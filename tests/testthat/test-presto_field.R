@@ -67,6 +67,14 @@ source("utilities.R")
     tibble::tibble(type_double = 3.14)
   )
   expect_type(df.double$type_double, "double")
+  # decimal type
+  expect_equal_data_frame(
+    df.decimal <- dbGetQuery(
+      conn, "select cast(9007199254740991.5 as decimal(17,1)) as type_decimal"
+    ),
+    tibble::tibble(type_decimal = "9007199254740991.5")
+  )
+  expect_type(df.decimal$type_decimal, "character")
   # character type
   expect_equal_data_frame(
     df.character <- dbGetQuery(conn, "select 'one' as type_character"),
@@ -112,19 +120,24 @@ source("utilities.R")
   expect_s3_class(df.timestamp$type_timestamp, "POSIXct")
   expect_equal(attr(df.timestamp$type_timestamp[[1]], "tz"), test.timezone())
   # timestamp with timezone type
+  timestamp_date <- "2022-09-21"
   expect_equal_data_frame(
     df.timestamp_with_tz <- dbGetQuery(
       conn,
       paste0(
-        "select timestamp '2022-09-21 01:02:03 ",
-        ifelse(type == "Presto", timezone, tz_to_offset(timezone)),
+        "select timestamp '", timestamp_date, " 01:02:03 ",
+        ifelse(
+          type == "Presto",
+          timezone,
+          tz_to_offset(timezone, dt = as.Date(timestamp_date))
+        ),
         "' as type_timestamp_with_tz"
       )
     ),
     tibble::tibble(
       type_timestamp_with_tz =
         lubridate::with_tz(
-          as.POSIXct("2022-09-21 01:02:03", tz = timezone),
+          as.POSIXct(paste0(timestamp_date, " 01:02:03"), tz = timezone),
           test.timezone()
         )
     )
@@ -270,6 +283,20 @@ test_that("Queries return the correct primitive types", {
     tibble::tibble(type_double = list(c(3.14, 6.28)))
   )
   purrr::walk(df.double$type_double, expect_type, "double")
+  # decimal type
+  expect_equal_data_frame(
+    df.decimal <- dbGetQuery(
+      conn,
+      paste0(
+        "select array[cast(-9007199254740991.5 as decimal(17,1)), ",
+        "cast(9007199254740991.5 as decimal(17,1))] as type_decimal"
+      )
+    ),
+    tibble::tibble(
+      type_decimal = list(c("-9007199254740991.5", "9007199254740991.5"))
+    )
+  )
+  purrr::walk(df.decimal$type_decimal, expect_type, "character")
   # character type
   expect_equal_data_frame(
     df.character <- dbGetQuery(
@@ -349,14 +376,25 @@ test_that("Queries return the correct primitive types", {
     ~ expect_equal(attr(., "tz"), test.timezone())
   )
   # timestamp with timezone type
+  timestamp_date <- "2022-09-21"
   expect_equal_data_frame(
     df.timestamp_with_tz <- dbGetQuery(
       conn,
       paste0("
       select
         array[
-          timestamp '2022-09-21 01:02:03 ", ifelse(type == "Presto", timezone, tz_to_offset(timezone)), "',
-          timestamp '2022-09-21 01:02:03 ", ifelse(type == "Presto", timezone, tz_to_offset(timezone)), "'
+          timestamp '", timestamp_date, " 01:02:03 ",
+          ifelse(
+            type == "Presto",
+            timezone,
+            tz_to_offset(timezone, dt = as.Date(timestamp_date))
+          ), "',
+          timestamp '", timestamp_date, " 01:02:03 ",
+          ifelse(
+            type == "Presto",
+            timezone,
+            tz_to_offset(timezone, dt = as.Date(timestamp_date))
+          ), "'
         ] as type_timestamp_with_tz
       ")
     ),
@@ -365,8 +403,8 @@ test_that("Queries return the correct primitive types", {
         lubridate::with_tz(
           as.POSIXct(
             c(
-              "2022-09-21 01:02:03",
-              "2022-09-21 01:02:03"
+              paste0(timestamp_date, " 01:02:03"),
+              paste0(timestamp_date, " 01:02:03")
             ),
             tz = timezone
           ),
@@ -746,6 +784,32 @@ test_that("Queries return the correct map types", {
     ),
     tibble::tibble(type_row_single_value = list(list(x = 1)))
   )
+  # single null row value is mapped to a single NA
+  expect_equal_data_frame(
+    df.row_single_null <- dbGetQuery(
+      conn, "select cast(null as row(x int)) as type_row_single_null"
+    ),
+    tibble::tibble(type_row_single_null = list(NA))
+  )
+  # single null row value with single row value is mapped to a list consisting
+  # of a NA and a named list
+  expect_equal_data_frame(
+    df.row_single_null_and_value <- dplyr::select(
+      dplyr::arrange(
+        dbGetQuery(
+          conn,
+          "
+            select 0 as row, cast(null as row(x int)) as type_row_single_null_and_value
+            union all
+            select 1 as row, cast(row(1) as row(x int)) as type_row_single_null_and_value
+          "
+        ),
+        row
+      ),
+      -row
+    ),
+    tibble::tibble(type_row_single_null_and_value = list(NA, list(x = 1)))
+  )
   # multiple row values are mapped to a multiple-value named list
   expect_equal_data_frame(
     df.row_multiple_values <- dbGetQuery(
@@ -1000,7 +1064,11 @@ test_that("Empty output can be returned", {
         "cast(type_timestamp_with_tz as varchar) AS ",
         "type_timestamp_with_tz_string ",
         "from (select timestamp '", timestamp_string, " ",
-        ifelse(type == "Presto", timezone, tz_to_offset(timezone)),
+        ifelse(
+          type == "Presto",
+          timezone,
+          tz_to_offset(timezone, dt = as.Date(timestamp_date))
+        ),
         "' as type_timestamp_with_tz)"
       )
     ),
@@ -1016,7 +1084,11 @@ test_that("Empty output can be returned", {
             as.POSIXct(timestamp_string, tz = timezone),
             digits = 3
           ), " ",
-          ifelse(type == "Presto", timezone, tz_to_offset(timezone))
+          ifelse(
+            type == "Presto",
+            timezone,
+            tz_to_offset(timezone, dt = as.Date(timestamp_date))
+          )
         )
     )
   )

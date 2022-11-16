@@ -233,7 +233,7 @@ get.process.func <- function(prf) {
       nms <- names(x)
       x <- replace_null_with_na(x)
       x <- process.func(x)
-      if (keep_names) {
+      if (keep_names && length(x) > 0L) {
         return(purrr::set_names(x, nms))
       } else {
         return(x)
@@ -382,6 +382,9 @@ organize.data.by.schema <- function(data, schema, keep_names = TRUE) {
   } else {
     col.count <- length(schema)
     if (length(data) > 0) {
+      if (length(data) == 1L && is.null(data[[1]])) {
+        return(NA)
+      }
       n_columns_by_row <- purrr::map_int(data, length)
       if (!all(n_columns_by_row == mean(n_columns_by_row))) {
         stop(
