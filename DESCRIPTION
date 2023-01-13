@@ -1,6 +1,6 @@
 Package: RPresto
 Title: DBI Connector to Presto
-Version: 1.4.1
+Version: 1.4.2
 Authors@R: c(
     person('Onur Ismail', 'Filiz', , 'onur@fb.com', role='aut'),
     person('Sergey', 'Goder', , 'sgoder@fb.com', role='aut'),
@@ -30,16 +30,17 @@ Collate: 'PrestoDriver.R' 'Presto.R' 'PrestoSession.R'
         'dbDisconnect.R' 'dbExistsTable.R' 'dbFetch.R' 'dbGetInfo.R'
         'dbGetQuery.R' 'dbGetRowCount.R' 'dbGetRowsAffected.R'
         'dbGetStatement.R' 'dbHasCompleted.R' 'dbIsValid.R'
-        'dbListFields.R' 'dbListTables.R' 'dbQuoteLiteral.R'
-        'dbReadTable.R' 'dbRemoveTable.R' 'dbSendQuery.R'
-        'dbUnloadDriver.R' 'dbWriteTable.R' 'dbplyr-db.R'
-        'dbplyr-sql.R' 'dbplyr-src.R' 'default.R' 'fetch.R'
-        'presto.field.R' 'presto.field_utilities.R' 'request_headers.R'
+        'dbListFields.R' 'dbListTables.R' 'dbQuoteIdentifier.R'
+        'dbQuoteLiteral.R' 'dbReadTable.R' 'dbRemoveTable.R'
+        'dbRenameTable.R' 'dbSendQuery.R' 'dbUnloadDriver.R'
+        'dbWriteTable.R' 'dbplyr-db.R' 'dbplyr-sql.R' 'dbplyr-src.R'
+        'default.R' 'fetch.R' 'presto.field.R'
+        'presto.field_utilities.R' 'request_headers.R'
         'sqlCreateTable.R' 'sqlCreateTableAs.R' 'zzz.R'
 RoxygenNote: 7.2.1
 VignetteBuilder: knitr
 NeedsCompilation: no
-Packaged: 2022-11-15 03:12:52 UTC; jarodm
+Packaged: 2023-01-13 05:15:00 UTC; jarodmeng
 Author: Onur Ismail Filiz [aut],
   Sergey Goder [aut],
   Jarod G.R. Meng [aut, cre],
@@ -47,4 +48,4 @@ Author: Onur Ismail Filiz [aut],
   John Myles White [ctb]
 Maintainer: Jarod G.R. Meng <jarodm@fb.com>
 Repository: CRAN
-Date/Publication: 2022-11-16 02:10:03 UTC
+Date/Publication: 2023-01-13 08:30:02 UTC

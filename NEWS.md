@@ -1,3 +1,13 @@
+# RPresto 1.4.2
+
+* Add a convenient wrapper `kerberos_configs()` to generate Kerberos header
+  configs that can be passed to the `request.config` argument of `dbConnect()`.
+  (#202 and #221). Thanks to @suzzettedetorres for providing this solution.
+* All functions that take table name as argument now work with
+  `dbplyr::in_schema()` and `DBI::Id()` besides the usual character table name.
+  (#228)
+* Create a new `dbRenameTable()` function to rename table name.
+
 # RPresto 1.4.1
 
 * `dbListFields` now works with identifier name which in turn supports the use

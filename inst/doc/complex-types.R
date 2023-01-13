@@ -94,7 +94,7 @@ DBI::dbListFields(con, "presto_array_of_maps")
 (
   df.array_of_maps <- dbGetQuery(
     con,
-    "SELECT * FROM presto_primitive_maps",
+    "SELECT * FROM presto_array_of_maps",
     bigint = "integer64"
   )
 )

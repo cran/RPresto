@@ -94,10 +94,7 @@ NULL
   if (found && overwrite) {
     # Without implementation of TRANSACTION, we play it safe by renaming
     # the to-be-overwritten table rather than deleting it right away
-    DBI::dbExecute(
-      conn,
-      DBI::SQL(paste("ALTER TABLE", name, "RENAME TO", rn))
-    )
+    dbRenameTable(conn, name, rn)
   }
 
   value <- DBI::sqlRownamesToColumn(value, row.names)
@@ -105,13 +102,10 @@ NULL
     {
       if (!found || overwrite) {
         if (use.one.query) {
-          sql_values <- DBI::sqlData(conn, value)
-          fields <- DBI::dbQuoteIdentifier(conn, names(sql_values))
-          rows <- do.call(paste, c(unname(sql_values), sep = ", "))
+          fields <- DBI::dbQuoteIdentifier(conn, colnames(value))
           sql <- DBI::SQL(paste0(
             "SELECT * FROM (\n",
-            "VALUES\n",
-            paste0("  (", rows, ")", collapse = ",\n"),
+            .create_values_statement(conn, value),
             ") AS t (", paste(fields, collapse = ", "), ")\n"
           ))
           dbCreateTableAs(
@@ -153,14 +147,11 @@ NULL
     },
     error = function(e) {
       # In case of error, try revert the origin table
-      if (dbExistsTable(conn, name)) {
+      if (dbExistsTable(conn, name) && !found) {
         dbRemoveTable(conn, name)
       }
       if (dbExistsTable(conn, rn)) {
-        DBI::dbExecute(
-          conn,
-          DBI::SQL(paste("ALTER TABLE", rn, "RENAME TO", name))
-        )
+        dbRenameTable(conn, rn, name)
       }
       stop(
         "Writing table ", name, ' failed with error: "',
@@ -183,6 +174,12 @@ NULL
 #' @export
 setMethod(
   "dbWriteTable",
-  c("PrestoConnection", "character", "data.frame"),
+  signature("PrestoConnection", "ANY", "data.frame"),
   .dbWriteTable
 )
+
+.create_values_statement <- function(conn, value, row.names = FALSE) {
+  sql_values <- DBI::sqlData(conn, value, row.names)
+  rows <- do.call(paste, c(unname(sql_values), sep = ", "))
+  DBI::SQL(paste0("VALUES\n", paste0("  (", rows, ")", collapse = ",\n")))
+}
