@@ -1,3 +1,7 @@
+# RPresto 1.4.3
+
+* Fixed `dbplyr` 2.3.0 compatibility issues. (#237)
+
 # RPresto 1.4.2
 
 * Add a convenient wrapper `kerberos_configs()` to generate Kerberos header
