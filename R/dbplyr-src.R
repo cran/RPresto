@@ -141,7 +141,7 @@ tbl.src_presto <- function(src, from, ..., vars = NULL) {
 #'
 #' @importFrom dplyr tbl
 #' @export
-#' @param conn A `PrestoConnection` object produced by `DBI::dbConnect()`.
+#' @param src A `PrestoConnection` object produced by `DBI::dbConnect()`.
 #' @param from Either a string (giving a table name) or a literal
 #'          [dbplyr::sql()] string.
 #' @param ... Passed on to [dbplyr::tbl_sql()]
@@ -162,8 +162,8 @@ tbl.src_presto <- function(src, from, ..., vars = NULL) {
 #' )
 #' my_tbl <- tbl(my_con, "my_table")
 #' }
-tbl.PrestoConnection <- function(conn, from, ...) {
-  dplyr::tbl(src_presto(con = conn), from = from, ...)
+tbl.PrestoConnection <- function(src, from, ...) {
+  dplyr::tbl(src_presto(con = src), from = from, ...)
 }
 
 #' S3 implementation of [dplyr::copy_to()] for remote Presto source
@@ -256,7 +256,6 @@ copy_to.PrestoConnection <- function(dest, df, name = deparse(substitute(df)), o
 #' @rdname dplyr_function_implementations
 compute.tbl_presto <- function(x, name, temporary = FALSE, ..., cte = FALSE) {
   name <- unname(name)
-  sql <- dbplyr::db_sql_render(dbplyr::remote_con(x), x, use_presto_cte = FALSE)
   if (identical(cte, TRUE)) {
     if (inherits(x$lazy_query, "lazy_base_remote_query")) {
       stop(
@@ -265,8 +264,14 @@ compute.tbl_presto <- function(x, name, temporary = FALSE, ..., cte = FALSE) {
       )
     }
     con <- dbplyr::remote_con(x)
+    sql <- dbplyr::db_sql_render(
+      dbplyr::remote_con(x), x, use_presto_cte = FALSE
+    )
     con@session$addCTE(name, sql, replace = TRUE)
   } else {
+    sql <- dbplyr::db_sql_render(
+      dbplyr::remote_con(x), x, use_presto_cte = TRUE
+    )
     name <- dbplyr::db_compute(
       dbplyr::remote_con(x), name, sql, temporary = temporary, ...
     )

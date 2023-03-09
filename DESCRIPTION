@@ -1,6 +1,6 @@
 Package: RPresto
 Title: DBI Connector to Presto
-Version: 1.4.3
+Version: 1.4.4
 Authors@R: c(
     person('Onur Ismail', 'Filiz', , 'onur@fb.com', role='aut'),
     person('Sergey', 'Goder', , 'sgoder@fb.com', role='aut'),
@@ -37,10 +37,10 @@ Collate: 'PrestoDriver.R' 'Presto.R' 'PrestoSession.R'
         'default.R' 'fetch.R' 'presto.field.R'
         'presto.field_utilities.R' 'request_headers.R'
         'sqlCreateTable.R' 'sqlCreateTableAs.R' 'zzz.R'
-RoxygenNote: 7.2.1
+RoxygenNote: 7.2.3
 VignetteBuilder: knitr
 NeedsCompilation: no
-Packaged: 2023-03-03 03:50:23 UTC; jarodm
+Packaged: 2023-03-09 02:12:03 UTC; jarodm
 Author: Onur Ismail Filiz [aut],
   Sergey Goder [aut],
   Jarod G.R. Meng [aut, cre],
@@ -48,4 +48,4 @@ Author: Onur Ismail Filiz [aut],
   John Myles White [ctb]
 Maintainer: Jarod G.R. Meng <jarodm@fb.com>
 Repository: CRAN
-Date/Publication: 2023-03-03 17:20:11 UTC
+Date/Publication: 2023-03-09 13:50:06 UTC

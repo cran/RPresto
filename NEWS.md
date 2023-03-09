@@ -1,3 +1,10 @@
+# RPresto 1.4.4
+
+* Fixed error whereby `compute()` returns a "table doesn't exist" error when the
+  computed table contains CTE. (#243)
+* Hotfix to update `tbl()` and `db_query_rows()` args to fix warnings by R CMD
+  CHECK on S3 generic consistency raised by CRAN. (#245)
+
 # RPresto 1.4.3
 
 * Fixed `dbplyr` 2.3.0 compatibility issues. (#237)
