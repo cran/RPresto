@@ -351,7 +351,7 @@ tibbles).</p>
 or later to have a more comprehensive and robust complex types
 support.</strong></p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">packageVersion</span>(<span class="st">&quot;RPresto&quot;</span>)</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] &#39;1.4.4&#39;</span></span></code></pre></div>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] &#39;1.4.5&#39;</span></span></code></pre></div>
 </div>
 <div id="overview" class="section level2">
 <h2>Overview</h2>
@@ -482,16 +482,15 @@ types they represent.</p>
 <span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>  )</span>
 <span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; # A tibble: 1 × 18</span></span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   array_boolean array_…¹ array…² array…³ array…⁴ array…⁵ array…⁶ array…⁷ array…⁸</span></span>
-<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   &lt;list&gt;        &lt;list&gt;   &lt;list&gt;  &lt;list&gt;  &lt;list&gt;  &lt;list&gt;  &lt;list&gt;  &lt;list&gt;  &lt;list&gt; </span></span>
-<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1 &lt;lgl [3]&gt;     &lt;int&gt;    &lt;int&gt;   &lt;int&gt;   &lt;int64&gt; &lt;dbl&gt;   &lt;dbl&gt;   &lt;chr&gt;   &lt;chr&gt;  </span></span>
-<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; # … with 9 more variables: array_char &lt;list&gt;, array_varbinary &lt;list&gt;,</span></span>
-<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; #   array_date &lt;list&gt;, array_time &lt;list&gt;, array_time_with_tz &lt;list&gt;,</span></span>
-<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; #   array_timestamp &lt;list&gt;, array_timestamp_with_tz &lt;list&gt;,</span></span>
-<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; #   array_interval_year_to_month &lt;list&gt;, array_interval_day_to_second &lt;list&gt;,</span></span>
-<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; #   and abbreviated variable names ¹​array_tinyint, ²​array_smallint,</span></span>
-<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; #   ³​array_integer, ⁴​array_bigint, ⁵​array_real, ⁶​array_double, ⁷​array_decimal,</span></span>
-<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; #   ⁸​array_varchar</span></span></code></pre></div>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   array_boolean array_tinyint array_smallint array_integer array_bigint</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   &lt;list&gt;        &lt;list&gt;        &lt;list&gt;         &lt;list&gt;        &lt;list&gt;      </span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1 &lt;lgl [3]&gt;     &lt;int [3]&gt;     &lt;int [3]&gt;      &lt;int [3]&gt;     &lt;int64 [3]&gt; </span></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; # ℹ 13 more variables: array_real &lt;list&gt;, array_double &lt;list&gt;,</span></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; #   array_decimal &lt;list&gt;, array_varchar &lt;list&gt;, array_char &lt;list&gt;,</span></span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; #   array_varbinary &lt;list&gt;, array_date &lt;list&gt;, array_time &lt;list&gt;,</span></span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; #   array_time_with_tz &lt;list&gt;, array_timestamp &lt;list&gt;,</span></span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; #   array_timestamp_with_tz &lt;list&gt;, array_interval_year_to_month &lt;list&gt;,</span></span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; #   array_interval_day_to_second &lt;list&gt;</span></span></code></pre></div>
 <p>We can verify the R types of each column.</p>
 <div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>tibble<span class="sc">::</span><span class="fu">enframe</span>(purrr<span class="sc">::</span><span class="fu">map_chr</span>(df.array_of_primitive_types, <span class="sc">~</span><span class="fu">class</span>(.[[<span class="dv">1</span>]])[<span class="dv">1</span>]))</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; # A tibble: 18 × 2</span></span>
@@ -591,15 +590,14 @@ types they represent.</p>
 <span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>  )</span>
 <span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; # A tibble: 1 × 18</span></span>
-<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   map_boolean map_tiny…¹ map_s…² map_i…³ map_b…⁴ map_r…⁵ map_d…⁶ map_d…⁷ map_v…⁸</span></span>
-<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   &lt;list&gt;      &lt;list&gt;     &lt;list&gt;  &lt;list&gt;  &lt;list&gt;  &lt;list&gt;  &lt;list&gt;  &lt;list&gt;  &lt;list&gt; </span></span>
-<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1 &lt;lgl [3]&gt;   &lt;int [3]&gt;  &lt;int&gt;   &lt;int&gt;   &lt;int64&gt; &lt;dbl&gt;   &lt;dbl&gt;   &lt;chr&gt;   &lt;chr&gt;  </span></span>
-<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; # … with 9 more variables: map_char &lt;list&gt;, map_varbinary &lt;list&gt;,</span></span>
-<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; #   map_date &lt;list&gt;, map_time &lt;list&gt;, map_time_with_tz &lt;list&gt;,</span></span>
-<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; #   map_timestamp &lt;list&gt;, map_timestamp_with_tz &lt;list&gt;,</span></span>
-<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; #   map_interval_year_to_month &lt;list&gt;, map_interval_day_to_second &lt;list&gt;, and</span></span>
-<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; #   abbreviated variable names ¹​map_tinyint, ²​map_smallint, ³​map_integer,</span></span>
-<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; #   ⁴​map_bigint, ⁵​map_real, ⁶​map_double, ⁷​map_decimal, ⁸​map_varchar</span></span></code></pre></div>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   map_boolean map_tinyint map_smallint map_integer map_bigint  map_real </span></span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   &lt;list&gt;      &lt;list&gt;      &lt;list&gt;       &lt;list&gt;      &lt;list&gt;      &lt;list&gt;   </span></span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1 &lt;lgl [3]&gt;   &lt;int [3]&gt;   &lt;int [3]&gt;    &lt;int [3]&gt;   &lt;int64 [3]&gt; &lt;dbl [3]&gt;</span></span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; # ℹ 12 more variables: map_double &lt;list&gt;, map_decimal &lt;list&gt;,</span></span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; #   map_varchar &lt;list&gt;, map_char &lt;list&gt;, map_varbinary &lt;list&gt;, map_date &lt;list&gt;,</span></span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; #   map_time &lt;list&gt;, map_time_with_tz &lt;list&gt;, map_timestamp &lt;list&gt;,</span></span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; #   map_timestamp_with_tz &lt;list&gt;, map_interval_year_to_month &lt;list&gt;,</span></span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; #   map_interval_day_to_second &lt;list&gt;</span></span></code></pre></div>
 <p>We can verify the R types of each column.</p>
 <div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>tibble<span class="sc">::</span><span class="fu">enframe</span>(purrr<span class="sc">::</span><span class="fu">map_chr</span>(df.map_of_primitive_types, <span class="sc">~</span><span class="fu">class</span>(.[[<span class="dv">1</span>]])[<span class="dv">1</span>]))</span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; # A tibble: 18 × 2</span></span>
@@ -684,16 +682,16 @@ although it’s technically possible in Presto.</p>
 <span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>  )</span>
 <span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; # A tibble: 1 × 18</span></span>
-<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   array_map_bo…¹ array…² array…³ array…⁴ array…⁵ array…⁶ array…⁷ array…⁸ array…⁹</span></span>
-<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   &lt;list&gt;         &lt;list&gt;  &lt;list&gt;  &lt;list&gt;  &lt;list&gt;  &lt;list&gt;  &lt;list&gt;  &lt;list&gt;  &lt;list&gt; </span></span>
-<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1 &lt;list [2]&gt;     &lt;list&gt;  &lt;list&gt;  &lt;list&gt;  &lt;list&gt;  &lt;list&gt;  &lt;list&gt;  &lt;list&gt;  &lt;list&gt; </span></span>
-<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; # … with 9 more variables: array_map_char &lt;list&gt;, array_map_varbinary &lt;list&gt;,</span></span>
-<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; #   array_map_date &lt;list&gt;, array_map_time &lt;list&gt;,</span></span>
-<span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; #   array_map_time_with_tz &lt;list&gt;, array_map_timestamp &lt;list&gt;,</span></span>
-<span id="cb21-15"><a href="#cb21-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; #   array_map_timestamp_with_tz &lt;list&gt;,</span></span>
-<span id="cb21-16"><a href="#cb21-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; #   array_map_interval_year_to_month &lt;list&gt;,</span></span>
-<span id="cb21-17"><a href="#cb21-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; #   array_map_interval_day_to_second &lt;list&gt;, and abbreviated variable names</span></span>
-<span id="cb21-18"><a href="#cb21-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; #   ¹​array_map_boolean, ²​array_map_tinyint, ³​array_map_smallint, …</span></span></code></pre></div>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   array_map_boolean array_map_tinyint array_map_smallint array_map_integer</span></span>
+<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   &lt;list&gt;            &lt;list&gt;            &lt;list&gt;             &lt;list&gt;           </span></span>
+<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1 &lt;list [2]&gt;        &lt;list [2]&gt;        &lt;list [2]&gt;         &lt;list [2]&gt;       </span></span>
+<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; # ℹ 14 more variables: array_map_bigint &lt;list&gt;, array_map_real &lt;list&gt;,</span></span>
+<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; #   array_map_double &lt;list&gt;, array_map_decimal &lt;list&gt;,</span></span>
+<span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; #   array_map_varchar &lt;list&gt;, array_map_char &lt;list&gt;,</span></span>
+<span id="cb21-15"><a href="#cb21-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; #   array_map_varbinary &lt;list&gt;, array_map_date &lt;list&gt;, array_map_time &lt;list&gt;,</span></span>
+<span id="cb21-16"><a href="#cb21-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; #   array_map_time_with_tz &lt;list&gt;, array_map_timestamp &lt;list&gt;,</span></span>
+<span id="cb21-17"><a href="#cb21-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; #   array_map_timestamp_with_tz &lt;list&gt;,</span></span>
+<span id="cb21-18"><a href="#cb21-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; #   array_map_interval_year_to_month &lt;list&gt;, …</span></span></code></pre></div>
 <p>We need to pry open the wrapping unnamed list to reveal the types of
 the vectors underneath.</p>
 <div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>tibble<span class="sc">::</span><span class="fu">enframe</span>(purrr<span class="sc">::</span><span class="fu">map_chr</span>(df.array_of_maps, <span class="sc">~</span><span class="fu">class</span>(.[[<span class="dv">1</span>]][[<span class="dv">1</span>]])[<span class="dv">1</span>]))</span>
