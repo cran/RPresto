@@ -6,8 +6,6 @@
 
 context("translate_sql")
 
-source("utilities.R")
-
 with_locale(test.locale(), test_that)("as() works", {
   if (!requireNamespace("dplyr", quietly = TRUE)) {
     skip("dplyr not available")
@@ -423,5 +421,24 @@ with_locale(test.locale(), test_that)("first(), last(), and nth() work", {
   expect_equal(
     dbplyr::translate_sql(nth(x, 2, order_by = y, na_rm = TRUE), con = s[["con"]]),
     dbplyr::sql('NTH_VALUE("x", 2) IGNORE NULLS OVER (ORDER BY "y")')
+  )
+})
+
+with_locale(test.locale(), test_that)("paste() works", {
+  s <- setup_mock_dplyr_connection()[["db"]]
+
+  expect_equal(
+    dbplyr::translate_sql(paste(a, b, c), con = s$con),
+    dbplyr::sql("\"a\" || ' ' || \"b\" || ' ' || \"c\"")
+  )
+
+  expect_equal(
+    dbplyr::translate_sql(paste(a, b, c, sep = "-"), con = s$con),
+    dbplyr::sql("\"a\" || '-' || \"b\" || '-' || \"c\"")
+  )
+
+  expect_equal(
+    dbplyr::translate_sql(paste0(a, b, c), con = s$con),
+    dbplyr::sql("\"a\" || \"b\" || \"c\"")
   )
 })

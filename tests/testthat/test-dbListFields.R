@@ -4,9 +4,7 @@
 # This source code is licensed under the BSD-style license found in the
 # LICENSE file in the root directory of this source tree.
 
-context("dbListFields")
-
-source("utilities.R")
+context(paste(Sys.getenv("PRESTO_TYPE", "Presto"), "dbListFields"))
 
 test_that("dbListFields works with live database", {
   conn <- setup_live_connection()
@@ -22,35 +20,25 @@ test_that("dbListFields works with live database", {
     dbListFields(result),
     paste0(
       "Query.*failed: (line [0-9:]+ )?",
-      "Table .*__non_existent_table__ does not exist"
+      "Table .*__non_existent_table__.* does not exist"
     )
   )
   expect_true(dbClearResult(result))
 })
 
 test_that("dbListFields works with identifier", {
-  skip_if_not(presto_has_default())
-
-  conn <- DBI::dbConnect(
-    drv = Presto(),
-    host = "http://localhost",
-    port = 8080,
-    user = Sys.getenv("USER"),
-    catalog = "memory",
-    schema = "default"
-  )
-  DBI::dbWriteTable(conn, "iris", iris, overwrite = TRUE)
+  conn <- setup_live_connection()
   expect_equal(
     DBI::dbListFields(conn, DBI::Id(table = "iris")),
-    tolower(colnames(iris))
+    tolower(colnames(iris_df))
   )
   expect_equal(
     DBI::dbListFields(conn, dbplyr::in_schema(conn@schema, "iris")),
-    tolower(colnames(iris))
+    tolower(colnames(iris_df))
   )
   expect_equal(
     DBI::dbListFields(conn, DBI::dbQuoteIdentifier(conn, "iris")),
-    tolower(colnames(iris))
+    tolower(colnames(iris_df))
   )
 })
 

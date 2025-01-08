@@ -4,9 +4,7 @@
 # This source code is licensed under the BSD-style license found in the
 # LICENSE file in the root directory of this source tree.
 
-context("session.property")
-
-source("utilities.R")
+context(paste(Sys.getenv("PRESTO_TYPE", "Presto"), "session.property"))
 
 query_session_property <- function(conn, property) {
   properties <- dbGetQuery(conn, "SHOW SESSION")

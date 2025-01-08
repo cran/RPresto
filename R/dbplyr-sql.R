@@ -69,6 +69,8 @@ presto_window_functions <- function() {
   }
   return(dbplyr::sql_translator(
     .parent = dbplyr::base_win,
+    paste = dbplyr::sql_paste_infix(" ", "||", function(x) dbplyr::sql_expr(cast(!!x %as% varchar))),
+    paste0 = dbplyr::sql_paste_infix("", "||", function(x) dbplyr::sql_expr(cast(!!x %as% varchar))),
     all = dbplyr::win_recycled("bool_and"),
     any = dbplyr::win_recycled("bool_or"),
     n_distinct = dbplyr::win_absent("n_distinct"),
@@ -190,3 +192,5 @@ sql_translation.PrestoConnection <- function(con) {
     presto_window_functions()
   ))
 }
+
+utils::globalVariables(c("cast", "%as%", "varchar"))

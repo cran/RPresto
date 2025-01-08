@@ -15,7 +15,17 @@ get_tables_from_sql.lazy_select_query <- function(query) {
 
 #' @export
 get_tables_from_sql.lazy_base_remote_query <- function(query) {
-  if (inherits(query$x, "dbplyr_table_ident")) {
+  if (inherits(query$x, "dbplyr_table_path")) { # dbplyr >= 2.5.0
+    sim_conn <- dbplyr::simulate_dbi("PrestoConnection")
+    table_name <- dbplyr::table_path_name(query$x, sim_conn)
+    if (utils::packageVersion("DBI") < "1.2.0") {
+      stop(
+        "DBI version needs to be >= 1.2.0 to be used with dbplyr >= 2.5.0",
+        call. = FALSE
+      )
+    }
+    DBI::dbUnquoteIdentifier(sim_conn, table_name)[[1]]@name
+  } else if (inherits(query$x, "dbplyr_table_ident")) { # dbplyr >= 2.4.0
     vctrs::field(query$x, "table")
   } else {
     as.character(query$x)
@@ -96,7 +106,7 @@ find_recursive_cte_tables <- function(con, cte_tables_list, ...) {
 
 find_cte_tables_from_try_result <- function(con, res, ...) {
   if (inherits(res, "try-error")) {
-    regex_pattern <- ".* Table (.+) does not exist"
+    regex_pattern <- ".* Table '?(.+?)'? does not exist"
     error_msg <- conditionMessage(attr(res, "condition"))
     if (grepl(regex_pattern, error_msg)) {
       missing_table <-

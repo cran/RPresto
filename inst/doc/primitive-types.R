@@ -1,4 +1,4 @@
-## ---- include = FALSE---------------------------------------------------------
+## ----include = FALSE----------------------------------------------------------
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
@@ -55,7 +55,9 @@ purrr::map_chr(df.boolean$boolean, class)
 purrr::map_chr(df.non_bigint_int, class)
 
 ## ----non-bigint-exception, error=TRUE-----------------------------------------
+try({
 dbGetQuery(con, "SELECT CAST('-2147483648' AS INTEGER) AS non_bigint_exception")
+})
 
 ## ----integer64-limits---------------------------------------------------------
 bit64::lim.integer64()

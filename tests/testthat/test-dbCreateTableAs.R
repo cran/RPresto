@@ -4,9 +4,7 @@
 # This source code is licensed under the BSD-style license found in the
 # LICENSE file in the root directory of this source tree.
 
-context("dbCreateTableAs and sqlCreateTableAs")
-
-source("utilities.R")
+context(paste(Sys.getenv("PRESTO_TYPE", "Presto"), "dbCreateTableAs and sqlCreateTableAs"))
 
 test_that("sqlCreateTableAs works", {
   conn <- setup_live_connection()

@@ -136,7 +136,7 @@ tbl.src_presto <- function(src, from, ..., vars = NULL) {
 
 #' Create a remote database source table using a PrestoConnection
 #'
-#' Automatically create a Presto remote database source to wrap aroudn the
+#' Automatically create a Presto remote database source to wrap around the
 #' `PrestoConnection` object via which DBI APIs can be called.
 #'
 #' @importFrom dplyr tbl
@@ -174,24 +174,37 @@ tbl.PrestoConnection <- function(src, from, ...) {
 #' @param with An optional WITH clause for the CREATE TABLE statement.
 #' @rdname dplyr_source_function_implementations
 #' @keywords internal
-copy_to.src_presto <- function(dest, df, name = deparse(substitute(df)), overwrite = FALSE,
+copy_to.src_presto <- function(dest, df, name = deparse(substitute(df)),
+                               overwrite = FALSE,
+                               types = NULL,
+                               temporary = FALSE,
+                               unique_indexes = NULL,
+                               indexes = NULL,
+                               analyze = FALSE,
                                ...,
+                               in_transaction = FALSE,
                                with = NULL) {
   if (inherits(df, "tbl_sql") && dplyr::same_src(df$src, dest)) {
-    out <- dplyr::compute(df,
+    out <- dplyr::compute(
+      df,
       name = name,
-      temporary = FALSE,
-      analyze = FALSE,
+      temporary = temporary,
+      unique_indexes = unique_indexes,
+      indexes = indexes,
+      analyze = analyze,
       ...
     )
   } else {
     df <- as.data.frame(dplyr::collect(df))
-    name <- dbplyr::db_copy_to(con = dest$con, table = name, values = df,
+    name <- dbplyr::db_copy_to(
+      con = dest$con, table = name, values = df,
       overwrite = overwrite,
-      types = NULL,
-      temporary = FALSE,
-      analyze = FALSE,
-      in_transaction = FALSE,
+      types = types,
+      temporary = temporary,
+      unique_indexes = unique_indexes,
+      indexes = indexes,
+      analyze = analyze,
+      in_transaction = in_transaction,
       with = with,
       ...
     )
@@ -232,13 +245,29 @@ collect.tbl_presto <- function(x, ..., n = Inf, warn_incomplete = TRUE) {
 #' @inheritParams dplyr::copy_to
 #' @rdname dplyr_source_function_implementations
 #' @keywords internal
-copy_to.PrestoConnection <- function(dest, df, name = deparse(substitute(df)), overwrite = FALSE, ..., with = NULL) {
+copy_to.PrestoConnection <- function(
+    dest, df, name = deparse(substitute(df)),
+    overwrite = FALSE,
+    types = NULL,
+    temporary = FALSE,
+    unique_indexes = NULL,
+    indexes = NULL,
+    analyze = FALSE,
+    ...,
+    in_transaction = FALSE,
+    with = NULL) {
   copy_to(
     dest = src_presto(con = dest),
     df = df,
     name = name,
     overwrite = overwrite,
+    types = types,
+    temporary = temporary,
+    unique_indexes = unique_indexes,
+    indexes = indexes,
+    analyze = analyze,
     ...,
+    in_transaction = in_transaction,
     with = with
   )
 }
@@ -253,8 +282,12 @@ copy_to.PrestoConnection <- function(dest, df, name = deparse(substitute(df)), o
       )
     }
     con <- dbplyr::remote_con(x)
+    # We need to speicify sql_options here so that use_presto_cte is passed to
+    # db_sql_render correctly
+    # (see https://github.com/tidyverse/dbplyr/issues/1394)
     sql <- dbplyr::db_sql_render(
-      dbplyr::remote_con(x), x, use_presto_cte = FALSE
+      con = dbplyr::remote_con(x), sql = x,
+      sql_options = dbplyr::sql_options(), use_presto_cte = FALSE
     )
     con@session$addCTE(name, sql, replace = TRUE)
   } else {

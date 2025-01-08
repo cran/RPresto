@@ -49,7 +49,7 @@ overflow: visible;
 </style>
 <style type="text/css" data-origin="pandoc">
 pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span { line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode > span { color: inherit; text-decoration: inherit; }
@@ -60,7 +60,7 @@ div.sourceCode { overflow: auto; }
 }
 @media print {
 pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
 }
 pre.numberSource code
 { counter-reset: source-line 0; }
@@ -366,7 +366,7 @@ available across the queries executed via the connection.</p>
 <code>packageVersion()</code> function. <strong>You need version 1.4.0
 or later to use the CTE feature.</strong></p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="fu">packageVersion</span>(<span class="st">&quot;RPresto&quot;</span>)</span>
-<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a><span class="co">#&gt; [1] &#39;1.4.6&#39;</span></span></code></pre></div>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a><span class="co">#&gt; [1] &#39;1.4.7&#39;</span></span></code></pre></div>
 </div>
 <div id="define-ctes-while-creating-a-prestoconnection" class="section level2">
 <h2>Define CTEs while creating a <code>PrestoConnection</code></h2>
@@ -438,8 +438,8 @@ typical analysis work flow.</p>
 twice on the <code>cyl</code> field and <code>UNION ALL</code> them
 together in the next step.</p>
 <div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a>tbl.mtcars.union <span class="ot">&lt;-</span> <span class="fu">union</span>(</span>
-<span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a>  <span class="fu">filter</span>(tbl.mtcars.transform, cyl <span class="sc">==</span> 4L),</span>
-<span id="cb10-3"><a href="#cb10-3" tabindex="-1"></a>  <span class="fu">filter</span>(tbl.mtcars.transform, cyl <span class="sc">==</span> 8L),</span>
+<span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a>  <span class="fu">filter</span>(tbl.mtcars.transform, cyl <span class="sc">==</span> <span class="dv">4</span><span class="dt">L</span>),</span>
+<span id="cb10-3"><a href="#cb10-3" tabindex="-1"></a>  <span class="fu">filter</span>(tbl.mtcars.transform, cyl <span class="sc">==</span> <span class="dv">8</span><span class="dt">L</span>),</span>
 <span id="cb10-4"><a href="#cb10-4" tabindex="-1"></a>  <span class="at">all =</span> <span class="cn">TRUE</span></span>
 <span id="cb10-5"><a href="#cb10-5" tabindex="-1"></a>)</span>
 <span id="cb10-6"><a href="#cb10-6" tabindex="-1"></a>tbl.mtcars.union <span class="sc">%&gt;%</span> <span class="fu">show_query</span>()</span>
@@ -496,8 +496,8 @@ executed yet.</p>
 <p>Now we’ve leveraged CTE, the query for the union step looks more
 clean and readable.</p>
 <div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a>tbl.mtcars.union <span class="ot">&lt;-</span> <span class="fu">union</span>(</span>
-<span id="cb12-2"><a href="#cb12-2" tabindex="-1"></a>  <span class="fu">filter</span>(tbl.mtcars.transform, cyl <span class="sc">==</span> 4L),</span>
-<span id="cb12-3"><a href="#cb12-3" tabindex="-1"></a>  <span class="fu">filter</span>(tbl.mtcars.transform, cyl <span class="sc">==</span> 8L),</span>
+<span id="cb12-2"><a href="#cb12-2" tabindex="-1"></a>  <span class="fu">filter</span>(tbl.mtcars.transform, cyl <span class="sc">==</span> <span class="dv">4</span><span class="dt">L</span>),</span>
+<span id="cb12-3"><a href="#cb12-3" tabindex="-1"></a>  <span class="fu">filter</span>(tbl.mtcars.transform, cyl <span class="sc">==</span> <span class="dv">8</span><span class="dt">L</span>),</span>
 <span id="cb12-4"><a href="#cb12-4" tabindex="-1"></a>  <span class="at">all =</span> <span class="cn">TRUE</span></span>
 <span id="cb12-5"><a href="#cb12-5" tabindex="-1"></a>)</span>
 <span id="cb12-6"><a href="#cb12-6" tabindex="-1"></a>tbl.mtcars.union <span class="sc">%&gt;%</span> <span class="fu">show_query</span>()</span>
@@ -534,25 +534,18 @@ calls it chained CTEs). Below we call <code>compute()</code> on
 <span id="cb13-10"><a href="#cb13-10" tabindex="-1"></a><span class="co">#&gt; ) &quot;q01&quot;</span></span>
 <span id="cb13-11"><a href="#cb13-11" tabindex="-1"></a><span class="co">#&gt; ),</span></span>
 <span id="cb13-12"><a href="#cb13-12" tabindex="-1"></a><span class="co">#&gt; &quot;mtcars_union&quot; AS (</span></span>
-<span id="cb13-13"><a href="#cb13-13" tabindex="-1"></a><span class="co">#&gt; WITH &quot;mtcars_transform&quot; AS (</span></span>
-<span id="cb13-14"><a href="#cb13-14" tabindex="-1"></a><span class="co">#&gt; SELECT &quot;q01&quot;.*, AVG(&quot;mpg&quot;) OVER (PARTITION BY &quot;cyl&quot;) AS &quot;mean_mpg_by_cyl&quot;</span></span>
-<span id="cb13-15"><a href="#cb13-15" tabindex="-1"></a><span class="co">#&gt; FROM (</span></span>
-<span id="cb13-16"><a href="#cb13-16" tabindex="-1"></a><span class="co">#&gt;   SELECT &quot;test_mtcars&quot;.*, pow(&quot;hp&quot;, 2.0) AS &quot;hp2&quot;</span></span>
-<span id="cb13-17"><a href="#cb13-17" tabindex="-1"></a><span class="co">#&gt;   FROM &quot;test_mtcars&quot;</span></span>
-<span id="cb13-18"><a href="#cb13-18" tabindex="-1"></a><span class="co">#&gt; ) &quot;q01&quot;</span></span>
-<span id="cb13-19"><a href="#cb13-19" tabindex="-1"></a><span class="co">#&gt; )</span></span>
-<span id="cb13-20"><a href="#cb13-20" tabindex="-1"></a><span class="co">#&gt; SELECT &quot;mtcars_transform&quot;.*</span></span>
-<span id="cb13-21"><a href="#cb13-21" tabindex="-1"></a><span class="co">#&gt; FROM &quot;mtcars_transform&quot;</span></span>
-<span id="cb13-22"><a href="#cb13-22" tabindex="-1"></a><span class="co">#&gt; WHERE (&quot;cyl&quot; = 4)</span></span>
-<span id="cb13-23"><a href="#cb13-23" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb13-24"><a href="#cb13-24" tabindex="-1"></a><span class="co">#&gt; UNION ALL</span></span>
-<span id="cb13-25"><a href="#cb13-25" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb13-26"><a href="#cb13-26" tabindex="-1"></a><span class="co">#&gt; SELECT &quot;mtcars_transform&quot;.*</span></span>
-<span id="cb13-27"><a href="#cb13-27" tabindex="-1"></a><span class="co">#&gt; FROM &quot;mtcars_transform&quot;</span></span>
-<span id="cb13-28"><a href="#cb13-28" tabindex="-1"></a><span class="co">#&gt; WHERE (&quot;cyl&quot; = 8)</span></span>
-<span id="cb13-29"><a href="#cb13-29" tabindex="-1"></a><span class="co">#&gt; )</span></span>
-<span id="cb13-30"><a href="#cb13-30" tabindex="-1"></a><span class="co">#&gt; SELECT *</span></span>
-<span id="cb13-31"><a href="#cb13-31" tabindex="-1"></a><span class="co">#&gt; FROM &quot;mtcars_union&quot;</span></span></code></pre></div>
+<span id="cb13-13"><a href="#cb13-13" tabindex="-1"></a><span class="co">#&gt; SELECT &quot;mtcars_transform&quot;.*</span></span>
+<span id="cb13-14"><a href="#cb13-14" tabindex="-1"></a><span class="co">#&gt; FROM &quot;mtcars_transform&quot;</span></span>
+<span id="cb13-15"><a href="#cb13-15" tabindex="-1"></a><span class="co">#&gt; WHERE (&quot;cyl&quot; = 4)</span></span>
+<span id="cb13-16"><a href="#cb13-16" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb13-17"><a href="#cb13-17" tabindex="-1"></a><span class="co">#&gt; UNION ALL</span></span>
+<span id="cb13-18"><a href="#cb13-18" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb13-19"><a href="#cb13-19" tabindex="-1"></a><span class="co">#&gt; SELECT &quot;mtcars_transform&quot;.*</span></span>
+<span id="cb13-20"><a href="#cb13-20" tabindex="-1"></a><span class="co">#&gt; FROM &quot;mtcars_transform&quot;</span></span>
+<span id="cb13-21"><a href="#cb13-21" tabindex="-1"></a><span class="co">#&gt; WHERE (&quot;cyl&quot; = 8)</span></span>
+<span id="cb13-22"><a href="#cb13-22" tabindex="-1"></a><span class="co">#&gt; )</span></span>
+<span id="cb13-23"><a href="#cb13-23" tabindex="-1"></a><span class="co">#&gt; SELECT *</span></span>
+<span id="cb13-24"><a href="#cb13-24" tabindex="-1"></a><span class="co">#&gt; FROM &quot;mtcars_union&quot;</span></span></code></pre></div>
 <p>Now the underlying query of the previous
 <code>tbl.mtcars.union</code> is saved into the
 <code>mtcars_union</code> CTE which in turn depends on the

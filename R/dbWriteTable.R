@@ -9,6 +9,7 @@ NULL
 
 #' @rdname PrestoConnection-class
 #' @inheritParams DBI::dbWriteTable
+#' @param conn a `PrestoConnection` object, as returned by [DBI::dbConnect()].
 #' @param chunk.fields A character vector of names of the fields that should
 #'   be used to slice the value data frame into chunks for batch append. This is
 #'   necessary when the data frame is too big to be uploaded at once in one
@@ -94,6 +95,11 @@ NULL
   rn <- paste0(
     "temp_", paste(sample(letters, 10, replace = TRUE), collapse = "")
   )
+  if (inherits(name, "dbplyr_schema")) {
+    name_sql <- DBI::dbQuoteIdentifier(conn, name)
+    name_with_schema <- DBI::dbUnquoteIdentifier(conn, name_sql)[[1]]@name
+    rn <- dbplyr::in_schema(name_with_schema[1], rn)
+  }
   if (found && overwrite) {
     # Without implementation of TRANSACTION, we play it safe by renaming
     # the to-be-overwritten table rather than deleting it right away

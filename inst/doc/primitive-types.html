@@ -49,7 +49,7 @@ overflow: visible;
 </style>
 <style type="text/css" data-origin="pandoc">
 pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span { line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode > span { color: inherit; text-decoration: inherit; }
@@ -60,7 +60,7 @@ div.sourceCode { overflow: auto; }
 }
 @media print {
 pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
 }
 pre.numberSource code
 { counter-reset: source-line 0; }
@@ -350,7 +350,7 @@ translated into R types in the <code>RPresto</code> package.</p>
 or later to have a more comprehensive and robust primitive types
 support.</strong></p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="fu">packageVersion</span>(<span class="st">&quot;RPresto&quot;</span>)</span>
-<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a><span class="co">#&gt; [1] &#39;1.4.6&#39;</span></span></code></pre></div>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a><span class="co">#&gt; [1] &#39;1.4.7&#39;</span></span></code></pre></div>
 </div>
 <div id="overview" class="section level2">
 <h2>Overview</h2>
@@ -969,7 +969,7 @@ timezone.</p>
 <code>session.timezone</code> slot of the <code>PrestoConnection</code>
 object.</p>
 <div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" tabindex="-1"></a>con<span class="sc">@</span>session.timezone</span>
-<span id="cb29-2"><a href="#cb29-2" tabindex="-1"></a><span class="co">#&gt; [1] &quot;Asia/Singapore&quot;</span></span></code></pre></div>
+<span id="cb29-2"><a href="#cb29-2" tabindex="-1"></a><span class="co">#&gt; [1] &quot;UTC&quot;</span></span></code></pre></div>
 <p>Here we get the <code>TIMESTAMP</code> and
 <code>TIMESTAMP WITH TIME ZONE</code> values from the table.</p>
 <div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" tabindex="-1"></a>(</span>
@@ -981,8 +981,8 @@ object.</p>
 <span id="cb30-7"><a href="#cb30-7" tabindex="-1"></a><span class="co">#&gt; # A tibble: 3 × 2</span></span>
 <span id="cb30-8"><a href="#cb30-8" tabindex="-1"></a><span class="co">#&gt;   timestamp           timestamp_with_tz  </span></span>
 <span id="cb30-9"><a href="#cb30-9" tabindex="-1"></a><span class="co">#&gt;   &lt;dttm&gt;              &lt;dttm&gt;             </span></span>
-<span id="cb30-10"><a href="#cb30-10" tabindex="-1"></a><span class="co">#&gt; 1 2000-01-01 01:02:03 2000-01-01 14:02:03</span></span>
-<span id="cb30-11"><a href="#cb30-11" tabindex="-1"></a><span class="co">#&gt; 2 2000-01-02 02:03:04 2000-01-02 15:03:04</span></span>
+<span id="cb30-10"><a href="#cb30-10" tabindex="-1"></a><span class="co">#&gt; 1 2000-01-01 01:02:03 2000-01-01 06:02:03</span></span>
+<span id="cb30-11"><a href="#cb30-11" tabindex="-1"></a><span class="co">#&gt; 2 2000-01-02 02:03:04 2000-01-02 07:03:04</span></span>
 <span id="cb30-12"><a href="#cb30-12" tabindex="-1"></a><span class="co">#&gt; 3 NA                  NA</span></span></code></pre></div>
 <p>We can check the R types of the two columns.</p>
 <div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" tabindex="-1"></a>purrr<span class="sc">::</span><span class="fu">map</span>(df.posixct, class)</span>
@@ -994,9 +994,9 @@ object.</p>
 <p>We can also verify that the time zone attributes match the session
 time zone.</p>
 <div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" tabindex="-1"></a>purrr<span class="sc">::</span><span class="fu">map_chr</span>(df.posixct<span class="sc">$</span>timestamp, lubridate<span class="sc">::</span>tz)</span>
-<span id="cb32-2"><a href="#cb32-2" tabindex="-1"></a><span class="co">#&gt; [1] &quot;Asia/Singapore&quot; &quot;Asia/Singapore&quot; &quot;Asia/Singapore&quot;</span></span>
+<span id="cb32-2"><a href="#cb32-2" tabindex="-1"></a><span class="co">#&gt; [1] &quot;UTC&quot; &quot;UTC&quot; &quot;UTC&quot;</span></span>
 <span id="cb32-3"><a href="#cb32-3" tabindex="-1"></a>purrr<span class="sc">::</span><span class="fu">map_chr</span>(df.posixct<span class="sc">$</span>timestamp_with_tz, lubridate<span class="sc">::</span>tz)</span>
-<span id="cb32-4"><a href="#cb32-4" tabindex="-1"></a><span class="co">#&gt; [1] &quot;Asia/Singapore&quot; &quot;Asia/Singapore&quot; &quot;Asia/Singapore&quot;</span></span></code></pre></div>
+<span id="cb32-4"><a href="#cb32-4" tabindex="-1"></a><span class="co">#&gt; [1] &quot;UTC&quot; &quot;UTC&quot; &quot;UTC&quot;</span></span></code></pre></div>
 </div>
 <div id="intervals" class="section level4">
 <h4><code>INTERVAL</code>s</h4>

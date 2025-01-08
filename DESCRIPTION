@@ -1,6 +1,6 @@
 Package: RPresto
 Title: DBI Connector to Presto
-Version: 1.4.6
+Version: 1.4.7
 Authors@R: c(
     person('Onur Ismail', 'Filiz', , 'onur@fb.com', role='aut'),
     person('Sergey', 'Goder', , 'sgoder@fb.com', role='aut'),
@@ -17,7 +17,7 @@ Depends: R (>= 3.1.0), methods
 Imports: DBI (>= 0.3.0), httr (>= 0.6), openssl, jsonlite, stringi,
         stats, utils, purrr, dplyr (>= 0.7.0), dbplyr (>= 2.3.3),
         tibble, bit64, rlang, lifecycle, lubridate, progress, vctrs
-Suggests: testthat, hms, knitr, rmarkdown
+Suggests: testthat, hms, knitr, rmarkdown, withr
 License: BSD_3_clause + file LICENSE
 URL: https://github.com/prestodb/RPresto
 BugReports: https://github.com/prestodb/RPresto/issues
@@ -37,10 +37,10 @@ Collate: 'PrestoDriver.R' 'Presto.R' 'PrestoSession.R'
         'default.R' 'fetch.R' 'presto.field.R'
         'presto.field_utilities.R' 'request_headers.R'
         'sqlCreateTable.R' 'sqlCreateTableAs.R' 'zzz.R'
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.2
 VignetteBuilder: knitr
 NeedsCompilation: no
-Packaged: 2023-10-30 14:38:41 UTC; jarodmeng
+Packaged: 2025-01-08 01:22:46 UTC; jarodm
 Author: Onur Ismail Filiz [aut],
   Sergey Goder [aut],
   Jarod G.R. Meng [aut, cre],
@@ -48,4 +48,4 @@ Author: Onur Ismail Filiz [aut],
   John Myles White [ctb]
 Maintainer: Jarod G.R. Meng <jarodm@fb.com>
 Repository: CRAN
-Date/Publication: 2023-11-01 01:00:02 UTC
+Date/Publication: 2025-01-08 05:40:17 UTC

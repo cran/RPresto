@@ -25,6 +25,10 @@
 \alias{dbListTables,PrestoConnection-method}
 \alias{.dbQuoteIdentifier_PrestoConnection_dbplyr_schema}
 \alias{dbQuoteIdentifier,PrestoConnection,dbplyr_schema-method}
+\alias{.dbQuoteIdentifier_PrestoConnection_dbplyr_table_path}
+\alias{dbQuoteIdentifier,PrestoConnection,dbplyr_table_path-method}
+\alias{.dbQuoteIdentifier_PrestoConnection_AsIs}
+\alias{dbQuoteIdentifier,PrestoConnection,AsIs-method}
 \alias{.dbQuoteLiteral}
 \alias{dbQuoteLiteral,PrestoConnection-method}
 \alias{.dbReadTable}
@@ -80,6 +84,10 @@
 
 \S4method{dbQuoteIdentifier}{PrestoConnection,dbplyr_schema}(conn, x, ...)
 
+\S4method{dbQuoteIdentifier}{PrestoConnection,dbplyr_table_path}(conn, x, ...)
+
+\S4method{dbQuoteIdentifier}{PrestoConnection,AsIs}(conn, x, ...)
+
 \S4method{dbQuoteLiteral}{PrestoConnection}(conn, x, ...)
 
 \S4method{dbReadTable}{PrestoConnection,ANY}(conn, name, ...)
@@ -126,8 +134,7 @@
 \S4method{sqlCreateTableAs}{PrestoConnection}(con, name, sql, with = NULL, ...)
 }
 \arguments{
-\item{conn}{A \linkS4class{DBIConnection} object, as returned by
-\code{\link[DBI:dbConnect]{dbConnect()}}.}
+\item{conn}{a \code{PrestoConnection} object, as returned by \code{\link[DBI:dbConnect]{DBI::dbConnect()}}.}
 
 \item{name}{The table name, passed on to \code{\link[DBI:dbQuoteIdentifier]{dbQuoteIdentifier()}}. Options are:
 \itemize{
@@ -139,8 +146,7 @@ e.g. \code{Id(schema = "my_schema", table = "table_name")}
 given verbatim, e.g. \code{SQL('"my_schema"."table_name"')}
 }}
 
-\item{value}{A data frame of values. The column names must be consistent
-with those in the target table in the database.}
+\item{value}{A \link{data.frame} (or coercible to data.frame).}
 
 \item{...}{Other parameters passed on to methods.}
 
@@ -163,7 +169,7 @@ A data frame: field types are generated using
 
 \item{with}{An optional WITH clause for the CREATE TABLE statement.}
 
-\item{temporary}{If \code{TRUE}, will generate a temporary table statement.}
+\item{temporary}{If \code{TRUE}, will generate a temporary table.}
 
 \item{quiet}{If a progress bar should be shown for long queries (which run
 for more than 2 seconds. Default to \code{getOption("rpresto.quiet")} which

@@ -4,9 +4,7 @@
 # This source code is licensed under the BSD-style license found in the
 # LICENSE file in the root directory of this source tree.
 
-context("db_query_fields")
-
-source("utilities.R")
+context(paste(Sys.getenv("PRESTO_TYPE", "Presto"), "db_query_fields"))
 
 test_that("db_query_fields works with live database", {
   s <- setup_live_dplyr_connection()
@@ -25,7 +23,7 @@ test_that("db_query_fields works with live database", {
       s[["db"]][["con"]],
       dplyr::ident(s[["iris_table_name"]])
     ),
-    c("sepal_length", "sepal_width", "petal_length", "petal_width", "species")
+    colnames(iris_df)
   )
 
   expect_error(
@@ -33,7 +31,7 @@ test_that("db_query_fields works with live database", {
       s[["db"]][["con"]],
       dplyr::ident("__non_existent_table__")
     ),
-    "Query.*failed:.*Table .*__non_existent_table__ does not exist"
+    "Query.*failed:.*Table .*__non_existent_table__'? does not exist"
   )
 })
 

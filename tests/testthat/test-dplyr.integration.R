@@ -6,8 +6,6 @@
 
 context("dplyr")
 
-source("utilities.R")
-
 test_that("dplyr integration works", {
   parts <- setup_live_dplyr_connection()
   db <- parts[["db"]]
@@ -21,14 +19,14 @@ test_that("dplyr integration works", {
   # collect() works
   expect_that(
     nrow(dplyr::collect(iris_presto, n = Inf)),
-    equals(nrow(iris))
+    equals(nrow(iris_df))
   )
 
   iris_presto_summary <- dplyr::arrange(
     dplyr::rename(
       dplyr::summarise(
         dplyr::group_by(iris_presto, species),
-        mean_sepal_length = mean(as(sepal_length, 0.0), na.rm = TRUE)
+        mean_sepal.length = mean(as(sepal.length, 0.0), na.rm = TRUE)
       ),
       Species = species
     ),
@@ -44,7 +42,7 @@ test_that("dplyr integration works", {
           ),
           Species
         ),
-        mean_sepal_length = mean(Sepal.Length, na.rm = TRUE)
+        mean_sepal.length = mean(Sepal.Length, na.rm = TRUE)
       ),
       Species
     )
@@ -72,7 +70,7 @@ test_that("dplyr integration works", {
   # so it should be tested.
   expect_that(
     nrow(dplyr::collect(dplyr::collapse(iris_presto), n = Inf)),
-    equals(nrow(iris))
+    equals(nrow(iris_df))
   )
 
   # compute() collapses a lazy query into a table

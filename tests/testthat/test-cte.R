@@ -4,9 +4,7 @@
 # This source code is licensed under the BSD-style license found in the
 # LICENSE file in the root directory of this source tree.
 
-context("ctes")
-
-source("utilities.R")
+context(paste(Sys.getenv("PRESTO_TYPE", "Presto"), "ctes"))
 
 test_that("CTEs created in dbConnect() works", {
   conn <- setup_live_connection(
@@ -29,15 +27,15 @@ test_that("CTEs work in dplyr backend", {
   db <- parts[["db"]]
   tablename <- parts[["iris_table_name"]]
   iris_presto <- dplyr::tbl(db, tablename)
-  iris_presto_mean <- iris_presto %>%
-    dplyr::group_by(species) %>%
+  iris_presto_mean <- iris_presto |>
+    dplyr::group_by(species) |>
     dplyr::summarize(
       across(.fns = ~mean(., na.rm = TRUE), .names = "mean_{.col}"),
       .groups = "drop"
     )
   expect_is(iris_presto_mean$lazy_query, "lazy_select_query")
   # One-level CTE works
-  iris_presto_mean_cte <- iris_presto_mean %>%
+  iris_presto_mean_cte <- iris_presto_mean |>
     dplyr::compute("iris_species_mean", cte = TRUE)
   expect_true(db$con@session$hasCTE("iris_species_mean"))
   expect_is(iris_presto_mean_cte$lazy_query, "lazy_base_remote_query")
@@ -47,12 +45,12 @@ test_that("CTEs work in dplyr backend", {
   )
   expect_true(RPresto:::is_cte_used(dbplyr::remote_query(iris_presto_mean_cte)))
   # Nested CTEs work
-  iris_presto_mean_2 <- iris_presto_mean_cte %>%
+  iris_presto_mean_2 <- iris_presto_mean_cte |>
     dplyr::summarize(
       across(-species, ~mean(., na.rm = TRUE))
     )
   expect_is(iris_presto_mean_2$lazy_query, "lazy_select_query")
-  iris_presto_mean_2_cte <- iris_presto_mean_2 %>%
+  iris_presto_mean_2_cte <- iris_presto_mean_2 |>
     dplyr::compute("iris_mean", cte = TRUE)
   expect_true(db$con@session$hasCTE("iris_mean"))
   expect_is(iris_presto_mean_2_cte$lazy_query, "lazy_base_remote_query")
@@ -73,7 +71,7 @@ test_that("Nested CTEs work", {
   iris_presto.width <- dplyr::compute(
     dplyr::summarize(
       dplyr::group_by(iris_presto, species),
-      mean_sepal_length = mean(sepal_length, na.rm = TRUE)
+      mean_sepal.length = mean(sepal.length, na.rm = TRUE)
     ),
     name = "iris_width", cte = TRUE
   )
@@ -81,7 +79,7 @@ test_that("Nested CTEs work", {
   iris_presto.length <- dplyr::compute(
     dplyr::summarize(
       dplyr::group_by(iris_presto, species),
-      mean_sepal_width = mean(sepal_width, na.rm = TRUE)
+      mean_sepal.width = mean(sepal.width, na.rm = TRUE)
     ),
     name = "iris_length", cte = TRUE
   )
@@ -101,8 +99,8 @@ test_that("Nested CTEs work", {
     c("iris_width", "iris_length", "iris_join")
   )
   expect_equal_data_frame(
-    dplyr::collect(iris_presto.join),
-    dplyr::collect(iris_presto.join_cte)
+    dplyr::arrange(dplyr::collect(iris_presto.join), species),
+    dplyr::arrange(dplyr::collect(iris_presto.join_cte), species)
   )
 })
 
@@ -115,7 +113,7 @@ test_that("CTEs using joins work", {
     dplyr::summarize(
       dplyr::group_by(iris_presto, species),
       dplyr::across(
-        sepal_length:petal_width,
+        sepal.length:petal.width,
         ~ mean(., na.rm = TRUE),
         .names = "{.col}_avg"
       )
@@ -216,7 +214,7 @@ test_that("CTEs using union work", {
         ),
         species
       ),
-      mean_sepal_length = mean(sepal_length, na.rm = TRUE)
+      mean_sepal.length = mean(sepal.length, na.rm = TRUE)
     ),
     name = "iris_width_virginica", cte = TRUE
   )
@@ -230,7 +228,7 @@ test_that("CTEs using union work", {
         ),
         species
       ),
-      mean_sepal_length = mean(sepal_length, na.rm = TRUE)
+      mean_sepal.length = mean(sepal.length, na.rm = TRUE)
     ),
     name = "iris_width_setosa", cte = TRUE
   )
